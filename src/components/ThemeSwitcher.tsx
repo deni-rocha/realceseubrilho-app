@@ -3,7 +3,7 @@ import { LuSun, LuSunMoon } from 'react-icons/lu';
 
 const ThemeSwitcher = () => {
   // Use o estado para rastrear o tema atual (ou pegue do localStorage)
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
 
   // Use useEffect para aplicar a classe ao elemento <html>
   useEffect(() => {
