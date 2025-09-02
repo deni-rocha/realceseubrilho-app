@@ -1,25 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { LuSun, LuSunMoon } from 'react-icons/lu';
+import { themeStore } from '../store/themeStore';
 
 const ThemeSwitcher = () => {
-  // Use o estado para rastrear o tema atual (ou pegue do localStorage)
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const { theme, toggleTheme } = themeStore();
 
-  // Use useEffect para aplicar a classe ao elemento <html>
   useEffect(() => {
     const htmlElement = document.documentElement;
+
     if (theme === 'dark') {
       htmlElement.classList.add('dark');
     } else {
       htmlElement.classList.remove('dark');
     }
+
     // Salva a preferência do usuário
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
 
   return (
     <button

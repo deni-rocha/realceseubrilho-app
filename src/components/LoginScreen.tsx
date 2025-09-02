@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaUser, FaLock, FaArrowRight } from 'react-icons/fa'; // Ícones de usuário, cadeado e seta
 import { useAuthStore } from '../store/authStore';
+import { toast } from 'react-toastify';
 
 const LoginScreen = () => {
   const [data, setData] = useState({ email: '', password: '' });
-  const { login, status } = useAuthStore();
+  const { login, status, error } = useAuthStore();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -15,25 +16,14 @@ const LoginScreen = () => {
     login({ email: data.email, password: data.password });
   }
 
-  if (status === 'succeeded') {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-primary-dark">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Login bem-sucedido!
-        </h1>
-      </div>
-    );
-  }
-
-  if (status === 'failed') {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-primary-dark">
-        <h1 className="text-2xl font-bold text-red-600">
-          Falha no login. Tente novamente.
-        </h1>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (status === 'succeeded') {
+      toast.success('Login realizado com sucesso!');
+    } else if (status === 'failed') {
+      toast.error(`Erro no login: ${error}`);
+    }
+    console.log('oii');
+  }, [status, error]);
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-gray-50 dark:bg-primary-dark overflow-hidden">
