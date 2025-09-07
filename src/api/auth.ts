@@ -1,4 +1,5 @@
 import api from '.';
+import type { EnumRole } from '../types/User';
 
 interface LoginResponse {
   access_token: string;
@@ -6,7 +7,7 @@ interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: EnumRole;
     verified: boolean;
   };
 }

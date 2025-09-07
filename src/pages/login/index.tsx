@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FaUser, FaLock, FaArrowRight } from 'react-icons/fa'; // Ícones de usuário, cadeado e seta
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
+import { Navigate } from 'react-router-dom';
 
-const LoginScreen = () => {
+const Login = () => {
   const [data, setData] = useState({ email: '', password: '' });
-  const { login, status, error } = useAuthStore();
+  const { login, status, error, user } = useAuthStore();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -22,8 +23,15 @@ const LoginScreen = () => {
     } else if (status === 'failed') {
       toast.error(`Erro no login: ${error}`);
     }
-    console.log('oii');
   }, [status, error]);
+
+  if (user) {
+    return user.role === 'ADMIN' ? (
+      <Navigate to="/admin" replace />
+    ) : (
+      <Navigate to="/customer" replace />
+    );
+  }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-gray-50 dark:bg-primary-dark overflow-hidden">
@@ -106,4 +114,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default Login;

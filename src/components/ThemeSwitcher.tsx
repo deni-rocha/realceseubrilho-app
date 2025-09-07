@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { LuSun, LuSunMoon } from 'react-icons/lu';
-import { themeStore } from '../store/themeStore';
+import { useThemeStore } from '../store/themeStore';
 
 const ThemeSwitcher = () => {
-  const { theme, toggleTheme } = themeStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   useEffect(() => {
     const htmlElement = document.documentElement;
