@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaUser, FaLock, FaArrowRight } from 'react-icons/fa'; // Ícones de usuário, cadeado e seta
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const Login = () => {
   const [data, setData] = useState({ email: '', password: '' });
@@ -98,16 +98,16 @@ const Login = () => {
           </div>
         </form>
 
-        <div className="text-center text-sm bg-primary">
+        <div className="text-center text-sm">
           <span className="text-gray-600 dark:text-gray-200">
             Não tem uma conta?
           </span>
-          <a
-            href="#"
+          <Link
+            to="/register-user"
             className="ml-1 text-yellow-600 font-semibold hover:underline"
           >
             Criar
-          </a>
+          </Link>
         </div>
       </div>
     </div>

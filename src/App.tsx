@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import { PrivateRoute } from './components/routes/PrivateRoute';
 import { useAuth } from './hooks/useAuth';
 import NotFound from './pages/notFound';
+import RegisterUser from './pages/register';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -50,6 +51,7 @@ function App() {
             }
           />
           <Route path="*" element={<NotFound />} />
+          <Route path="register-user" element={<RegisterUser />} />
         </Route>
       </Routes>
     </BrowserRouter>

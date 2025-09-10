@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import type { EnumRole } from '../../types/User';
+import type { EnumRole } from '../../types/UserAuth';
 
 interface PrivateRouteProps {
   children: ReactNode;

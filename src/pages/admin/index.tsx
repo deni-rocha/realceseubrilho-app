@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
+import UserList from '../../components/UserList';
+import Dashboard from '../../components/admin/Dashboard';
+import FormUser from '../../components/FormUser';
 
-const Dashboard: React.FC = () => {
+const AdminPainel: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUsersDropdownOpen, setIsUsersDropdownOpen] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(true);
+  const [showUserList, setShowUserList] = useState(false);
+  const [showUserAdd, setShowUserAdd] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
   const { logout } = useAuthStore();
 
@@ -14,6 +22,52 @@ const Dashboard: React.FC = () => {
 
   const toggleUsersDropdown = () => {
     setIsUsersDropdownOpen(!isUsersDropdownOpen);
+  };
+
+  const toggleOptionsMenu = (
+    v: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+  ) => {
+    let id = v.currentTarget.id;
+
+    switch (id) {
+      case 'dashboard':
+        setShowDashboard(true);
+        setShowUserList(false);
+        setShowUserAdd(false);
+        setShowSettings(false);
+        setShowLogout(false);
+        break;
+      case 'user-list':
+        setShowDashboard(false);
+        setShowUserList(true);
+        setShowUserAdd(false);
+        setShowSettings(false);
+        setShowLogout(false);
+        break;
+      case 'user-add':
+        setShowDashboard(false);
+        setShowUserList(false);
+        setShowUserAdd(true);
+        setShowSettings(false);
+        setShowLogout(false);
+        break;
+      case 'settings':
+        setShowDashboard(false);
+        setShowUserList(false);
+        setShowUserAdd(false);
+        setShowSettings(true);
+        setShowLogout(false);
+        break;
+      case 'logout':
+        setShowDashboard(false);
+        setShowUserList(false);
+        setShowUserAdd(false);
+        setShowSettings(false);
+        setShowLogout(true);
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -51,8 +105,9 @@ const Dashboard: React.FC = () => {
           <ul className="flex flex-col space-y-2">
             <li>
               <a
-                href="#dashboard"
-                className="block p-2 rounded-md hover:bg-gray-700"
+                id="dashboard"
+                onClick={toggleOptionsMenu}
+                className="cursor-pointer block p-2 rounded-md hover:bg-gray-700"
               >
                 Dashboard
               </a>
@@ -73,16 +128,18 @@ const Dashboard: React.FC = () => {
                 <ul className="pl-4 mt-2 space-y-1">
                   <li>
                     <a
-                      href="#users/list"
-                      className="block p-2 rounded-md text-sm hover:bg-gray-700"
+                      id="user-list"
+                      onClick={toggleOptionsMenu}
+                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-gray-700"
                     >
                       Lista de Usuários
                     </a>
                   </li>
                   <li>
                     <a
-                      href="#users/add"
-                      className="block p-2 rounded-md text-sm hover:bg-gray-700"
+                      id="user-add"
+                      onClick={toggleOptionsMenu}
+                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-gray-700"
                     >
                       Adicionar Novo
                     </a>
@@ -92,8 +149,9 @@ const Dashboard: React.FC = () => {
             </li>
             <li>
               <a
-                href="#settings"
-                className="block p-2 rounded-md hover:bg-gray-700"
+                id="settings"
+                onClick={toggleOptionsMenu}
+                className="cursor-pointer block p-2 rounded-md hover:bg-gray-700"
               >
                 Configurações
               </a>
@@ -112,32 +170,14 @@ const Dashboard: React.FC = () => {
 
       {/* --- Conteúdo Principal --- */}
       <main className="flex-1 p-8 md:ml-0 overflow-y-auto">
-        <h2 className="text-3xl font-semibold text-gray-900 mb-6 dark:text-white">
-          Visão Geral
-        </h2>
-        <p className="text-gray-700 mb-8 dark:text-white">
-          Bem-vindo ao painel administrativo. Aqui você pode gerenciar todas as
-          configurações da sua aplicação.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium text-gray-900">
-              Total de Vendas
-            </h3>
-            <p className="mt-2 text-2xl font-bold text-gray-600">
-              R$ 15.000,00
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium text-gray-900">
-              Usuários Ativos
-            </h3>
-            <p className="mt-2 text-2xl font-bold text-gray-600">1200</p>
-          </div>
-        </div>
+        {showUserList && <UserList />}
+        {showDashboard && <Dashboard />}
+        {showUserAdd && <FormUser />}
+        {showSettings && <div>Configurações - Em Desenvolvimento</div>}
+        {showLogout && <div>Saindo...</div>}
       </main>
     </div>
   );
 };
 
-export default Dashboard;
+export default AdminPainel;

@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { login } from '../api/auth';
-import type { User } from '../types/User';
+import type { UserAuth } from '../types/UserAuth';
 import handleApiError from '../utils/handleApiError';
 
 interface AuthState {
-  user: User | null;
+  user: UserAuth | null;
   access_token: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;

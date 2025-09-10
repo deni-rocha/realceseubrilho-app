@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
@@ -21,11 +22,15 @@ const registerServiceWorker = async () => {
   }
 };
 
+const queryClient = new QueryClient();
+
 // Registra ANTES de renderizar o React
 registerServiceWorker().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </React.StrictMode>,
   );
 });

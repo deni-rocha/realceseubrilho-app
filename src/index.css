@@ -3,7 +3,7 @@
 @theme {
   --color-primary: 255 255 255;
   --color-secondary: 243 244 246;
-  --color-text: 17 24 39;
+  --color-primary-text: #000000;
   --color-accent: 99 102 241;
 
   --color-primary-dark: #1d1d20;
