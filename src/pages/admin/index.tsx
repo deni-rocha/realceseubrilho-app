@@ -73,13 +73,13 @@ const AdminPainel: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-primary-dark">
       {/* --- Cabeçalho Mobile --- */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm z-10">
-        <h1 className="text-xl font-bold text-gray-800">
+      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm z-10 dark:bg-accent-dark dark:border-gray-700">
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
           Painel Administrativo
         </h1>
         <button
           onClick={toggleMenu}
-          className="text-gray-600 focus:outline-none focus:text-gray-800 md:dark:text-white"
+          className="text-gray-600 focus:outline-none focus:text-gray-800 dark:text-white dark:focus:text-gray-200"
           aria-label="Toggle menu"
         >
           {isMenuOpen ? (
@@ -94,9 +94,10 @@ const AdminPainel: React.FC = () => {
       <aside
         className={`
           transform transition-transform duration-300 ease-in-out
-          bg-gray-800 text-white w-64 p-4
+          bg-green-800 text-white w-64 p-4
           fixed inset-y-0 left-0 z-50
-          md:relative md:translate-x-0
+          md:translate-x-0
+          md:sticky md:top-0 md:h-screen
           ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           dark:bg-accent-dark dark:text-white
         `}
@@ -107,7 +108,7 @@ const AdminPainel: React.FC = () => {
               <a
                 id="dashboard"
                 onClick={toggleOptionsMenu}
-                className="cursor-pointer block p-2 rounded-md hover:bg-gray-700"
+                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
               >
                 Dashboard
               </a>
@@ -115,7 +116,7 @@ const AdminPainel: React.FC = () => {
             <li className="relative">
               <button
                 onClick={toggleUsersDropdown}
-                className="flex items-center justify-between w-full p-2 rounded-md hover:bg-gray-700 focus:outline-none"
+                className="flex items-center justify-between w-full p-2 rounded-md hover:bg-green-700 focus:outline-none dark:hover:bg-gray-700"
               >
                 <span>Usuários</span>
                 <span
@@ -130,7 +131,7 @@ const AdminPainel: React.FC = () => {
                     <a
                       id="user-list"
                       onClick={toggleOptionsMenu}
-                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-gray-700"
+                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-green-700 dark:hover:bg-gray-700"
                     >
                       Lista de Usuários
                     </a>
@@ -139,7 +140,7 @@ const AdminPainel: React.FC = () => {
                     <a
                       id="user-add"
                       onClick={toggleOptionsMenu}
-                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-gray-700"
+                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-green-700 dark:hover:bg-gray-700"
                     >
                       Adicionar Novo
                     </a>
@@ -151,7 +152,7 @@ const AdminPainel: React.FC = () => {
               <a
                 id="settings"
                 onClick={toggleOptionsMenu}
-                className="cursor-pointer block p-2 rounded-md hover:bg-gray-700"
+                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
               >
                 Configurações
               </a>
@@ -159,7 +160,7 @@ const AdminPainel: React.FC = () => {
             <li>
               <a
                 onClick={logout}
-                className="cursor-pointer block p-2 rounded-md hover:bg-gray-700"
+                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
               >
                 Sair
               </a>
@@ -169,12 +170,16 @@ const AdminPainel: React.FC = () => {
       </aside>
 
       {/* --- Conteúdo Principal --- */}
-      <main className="flex-1 p-8 md:ml-0 overflow-y-auto">
+      <main className="flex-1 p-8 md:ml-0  overflow-y-auto  bg-gray-100 dark:bg-primary-dark">
         {showUserList && <UserList />}
         {showDashboard && <Dashboard />}
         {showUserAdd && <FormUser />}
-        {showSettings && <div>Configurações - Em Desenvolvimento</div>}
-        {showLogout && <div>Saindo...</div>}
+        {showSettings && (
+          <div className="dark:text-white">
+            Configurações - Em Desenvolvimento
+          </div>
+        )}
+        {showLogout && <div className="dark:text-white">Saindo...</div>}
       </main>
     </div>
   );

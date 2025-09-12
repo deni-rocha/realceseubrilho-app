@@ -10,7 +10,7 @@ const UserCard = ({ user }: UserCardProps) => {
     <div className="bg-white p-6 rounded-lg shadow-md max-w-sm mx-auto">
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex-shrink-0">
-          <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
+          <div className="h-12 w-12 rounded-full bg-green-800 flex items-center justify-center text-white font-bold text-xl">
             {user.name.charAt(0)}
           </div>
         </div>
@@ -23,7 +23,7 @@ const UserCard = ({ user }: UserCardProps) => {
         <p>
           <span className="font-medium text-gray-900">Nível de Acesso:</span>{' '}
           <span
-            className={`font-semibold ${user.role.name === 'ADMIN' ? 'text-red-600' : 'text-blue-600'}`}
+            className={`font-semibold ${user.role.name === 'ADMIN' ? 'text-green-800' : 'text-blue-600'}`}
           >
             {translateRole(user.role.name)}
           </span>

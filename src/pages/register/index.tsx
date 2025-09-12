@@ -11,9 +11,10 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import type { User } from '../types/User';
-import api from '../api';
-import type { ApiError } from '../utils/handleApiError';
+import { Link } from 'react-router-dom';
+import type { User } from '../../types/User';
+import api from '../../api';
+import type { ApiError } from '../../utils/handleApiError';
 
 // 1. Definição do Esquema de Validação com Zod
 const formSchema = z
@@ -57,7 +58,7 @@ const FormUser: React.FC = () => {
         email: data.email,
         password: data.password,
       };
-      await api.post<User>('/auth/register', userToRegister);
+      const response = await api.post<User>('/auth/register', userToRegister);
 
       toast.success('Usuário cadastrado com sucesso!');
     } catch (err) {
@@ -85,7 +86,7 @@ const FormUser: React.FC = () => {
                 className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.name
                     ? 'border-red-500 focus:ring-red-300'
-                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-500'
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('name')}
               />
@@ -107,7 +108,7 @@ const FormUser: React.FC = () => {
                 className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.email
                     ? 'border-red-500 focus:ring-red-300'
-                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-500'
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('email')}
               />
@@ -129,7 +130,7 @@ const FormUser: React.FC = () => {
                 className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.password
                     ? 'border-red-500 focus:ring-red-300'
-                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-500'
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('password')}
               />
@@ -151,7 +152,7 @@ const FormUser: React.FC = () => {
                 className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.confirmPassword
                     ? 'border-red-500 focus:ring-red-300'
-                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-500'
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('confirmPassword')}
               />
@@ -168,7 +169,7 @@ const FormUser: React.FC = () => {
                 <FaUserShield />
               </span>
               <select
-                className="w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white dark:bg-accent-dark dark:border-black dark:focus:ring-yellow-500"
+                className="w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white dark:bg-accent-dark"
                 {...register('role')}
               >
                 <option value={'CUSTOMER'}>Cliente</option>
@@ -197,6 +198,18 @@ const FormUser: React.FC = () => {
             </button>
           </div>
         </form>
+
+        <div className="text-center text-sm">
+          <span className="text-gray-600 dark:text-gray-200">
+            Já tem uma conta?
+          </span>
+          <Link
+            to="/login"
+            className="ml-1 text-green-600 font-semibold hover:underline dark:text-yellow-600"
+          >
+            Entrar
+          </Link>
+        </div>
       </div>
     </div>
   );

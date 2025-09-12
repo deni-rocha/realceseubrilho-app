@@ -8,6 +8,8 @@ import { PrivateRoute } from './components/routes/PrivateRoute';
 import { useAuth } from './hooks/useAuth';
 import NotFound from './pages/notFound';
 import RegisterUser from './pages/register';
+import VerifyEmail from './pages/verifyEmail';
+import RequestEmailVerification from './pages/requestEmailVerification';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -52,6 +54,11 @@ function App() {
           />
           <Route path="*" element={<NotFound />} />
           <Route path="register-user" element={<RegisterUser />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
+          <Route
+            path="request-email-verification"
+            element={<RequestEmailVerification />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
