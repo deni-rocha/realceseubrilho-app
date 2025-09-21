@@ -1,13 +1,42 @@
+import { FaEdit } from 'react-icons/fa';
 import type { UserDetails } from '../types/UserDetails';
 import translateRole from '../utils/translateRole';
+import { type Dispatch } from 'react';
 
 interface UserCardProps {
   user: UserDetails;
+  userCardDetails: {
+    active: boolean;
+    userId: string | null;
+  };
+  setUserCardDetails: Dispatch<
+    React.SetStateAction<{
+      active: boolean;
+      userId: string | null;
+    }>
+  >;
 }
 
-const UserCard = ({ user }: UserCardProps) => {
+const UserCard = ({
+  user,
+  userCardDetails,
+  setUserCardDetails,
+}: UserCardProps) => {
+  const handleEditClick = () => {
+    setUserCardDetails({ active: !userCardDetails.active, userId: user.id });
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-sm mx-auto">
+    <div className="relative bg-white p-6 rounded-lg shadow-md max-w-sm mx-auto">
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={handleEditClick}
+          className="cursor-pointer text-gray-500 hover:text-green-600 transition-colors duration-200"
+          aria-label="Editar usuário"
+        >
+          <FaEdit className="h-5 w-5" />
+        </button>
+      </div>
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex-shrink-0">
           <div className="h-12 w-12 rounded-full bg-green-800 flex items-center justify-center text-white font-bold text-xl">

@@ -70,7 +70,7 @@ const FormUser: React.FC = () => {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
+    <div className="relative flex items-center justify-center min-h-screen bg-inherit dark:bg-primary-dark overflow-hidden">
       <div className="relative z-10 w-full max-w-sm p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6 mb-8">
