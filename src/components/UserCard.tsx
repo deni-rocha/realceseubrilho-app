@@ -43,9 +43,11 @@ const UserCard = ({
             {user.name.charAt(0)}
           </div>
         </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900">{user.name}</h3>
-          <p className="text-gray-500 text-sm">{user.email}</p>
+        <div className="flex-1 min-w-0">
+          <h3 className="truncate text-xl font-semibold text-gray-900">
+            {user.name}
+          </h3>
+          <p className="truncate text-gray-500 text-sm">{user.email}</p>
         </div>
       </div>
       <div className="space-y-2 text-sm text-gray-700">

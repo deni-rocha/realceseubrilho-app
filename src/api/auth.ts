@@ -2,7 +2,8 @@ import api from '.';
 import type { EnumRole } from '../types/UserAuth';
 
 interface LoginResponse {
-  access_token: string;
+  accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     name: string;

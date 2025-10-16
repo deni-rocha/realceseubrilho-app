@@ -71,7 +71,7 @@ const FormUser: React.FC = () => {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
+    <div className="relative flex text-sm items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
       <div className="relative z-10 w-full max-w-sm p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6 mb-8">
@@ -182,7 +182,7 @@ const FormUser: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center px-8 py-3 text-lg text-white font-semibold bg-gradient-to-r from-green-800 to-green-600 rounded-full shadow-lg hover:from-green-700 hover:to-green-500 focus:outline-none focus:ring-4 focus:ring-green-400 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:from-green-500 disabled:to-green-400 disabled:cursor-not-allowed dark:from-yellow-500 dark:to-yellow-600 dark:hover:from-yellow-600 dark:hover:to-yellow-700 dark:focus:ring-yellow-300 dark:disabled:from-yellow-400 dark:disabled:to-yellow-500"
+              className="flex items-center justify-center px-8 py-3 md:text-lg text-white font-semibold bg-gradient-to-r from-green-800 to-green-600 rounded-full shadow-lg hover:from-green-700 hover:to-green-500 focus:outline-none focus:ring-4 focus:ring-green-400 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:from-green-500 disabled:to-green-400 disabled:cursor-not-allowed dark:from-yellow-500 dark:to-yellow-600 dark:hover:from-yellow-600 dark:hover:to-yellow-700 dark:focus:ring-yellow-300 dark:disabled:from-yellow-400 dark:disabled:to-yellow-500"
             >
               {isSubmitting ? (
                 <>

@@ -8,7 +8,7 @@ const Layout = () => {
 
   return (
     <div className="app">
-      <div className="hidden md:block absolute top-4 right-4 z-20">
+      <div className="hidden md:block absolute top-2 right-0 z-20">
         <ThemeSwitcher />
       </div>
       <ToastContainer theme={theme} />

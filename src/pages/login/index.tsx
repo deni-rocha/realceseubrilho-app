@@ -3,6 +3,7 @@ import { FaUser, FaLock, FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
+import handleApiError from '../../utils/handleApiError';
 
 const Login = () => {
   const [data, setData] = useState({ email: '', password: '' });
@@ -34,13 +35,13 @@ const Login = () => {
   }
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
-      <div className="relative z-10 w-full max-w-sm p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
+    <div className="relative text-sm flex items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
+      <div className="relative z-10 p-4 bg-white dark:bg-accent-dark rounded-lg shadow-lg max-w-sm sm:p-8 sm:w-full">
         <div className="text-center mb-12">
           <img
             src="/logo-512x512.png"
             alt="Logo"
-            className="mx-auto mb-4 w-50 h-50 object-contain"
+            className="mx-auto mb-4 w-30 h-30 md:w-50 md:h-50 object-contain lg:"
           />
           <p className="text-gray-600 dark:text-white">
             Acesse sua conta para continuar.
@@ -77,7 +78,7 @@ const Login = () => {
             </div>
             <a
               href="#"
-              className="block text-right text-sm text-gray-500 hover:underline dark:text-gray-300"
+              className="block text-right text-gray-500 hover:underline dark:text-gray-300"
             >
               Esqueceu sua senha?
             </a>
@@ -88,7 +89,7 @@ const Login = () => {
               type="submit"
               onClick={handleSubmit}
               disabled={status === 'loading'}
-              className="flex items-center justify-center px-8 py-3 text-lg text-white font-semibold bg-gradient-to-r from-green-800 to-green-600 rounded-full shadow-lg hover:from-green-700 hover:to-green-500 focus:outline-none focus:ring-4 focus:ring-green-400 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:from-green-500 disabled:to-green-400 disabled:cursor-not-allowed dark:from-yellow-500 dark:to-yellow-600 dark:hover:from-yellow-600 dark:hover:to-yellow-700 dark:focus:ring-yellow-300 dark:disabled:from-yellow-400 dark:disabled:to-yellow-500"
+              className="flex items-center justify-center px-8 py-3 text-sm sm:text-lg text-white font-semibold bg-gradient-to-r from-green-800 to-green-600 rounded-full shadow-lg hover:from-green-700 hover:to-green-500 focus:outline-none focus:ring-4 focus:ring-green-400 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:from-green-500 disabled:to-green-400 disabled:cursor-not-allowed dark:from-yellow-500 dark:to-yellow-600 dark:hover:from-yellow-600 dark:hover:to-yellow-700 dark:focus:ring-yellow-300 dark:disabled:from-yellow-400 dark:disabled:to-yellow-500"
             >
               {status === 'loading' ? (
                 <>
@@ -105,7 +106,7 @@ const Login = () => {
           </div>
         </form>
 
-        <div className="text-center text-sm">
+        <div className="text-center">
           <span className="text-gray-600 dark:text-gray-200">
             Ainda não tem uma conta?
           </span>

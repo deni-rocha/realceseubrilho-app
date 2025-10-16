@@ -5,7 +5,7 @@ import handleApiError from '../utils/handleApiError';
 
 interface AuthState {
   user: UserAuth | null;
-  access_token: string | null;
+  accessToken: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   login: (credentials: { email: string; password: string }) => Promise<void>;
@@ -16,8 +16,8 @@ export const useAuthStore = create<AuthState>((set, _get) => ({
   user: localStorage.getItem('user')
     ? JSON.parse(localStorage.getItem('user') as string)
     : null,
-  access_token: localStorage.getItem('access_token')
-    ? localStorage.getItem('access_token')
+  accessToken: localStorage.getItem('accessToken')
+    ? localStorage.getItem('accessToken')
     : null,
   status: 'idle',
   error: null,
@@ -31,20 +31,23 @@ export const useAuthStore = create<AuthState>((set, _get) => ({
       if (response.status === 201) {
         set({
           user: response.data.user,
-          access_token: response.data.access_token,
+          accessToken: response.data.accessToken,
           status: 'succeeded',
         });
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
       }
     } catch (error) {
-      set({ status: 'failed', error: handleApiError(error) });
+      const message = await handleApiError(error);
+      set({ status: 'failed', error: message });
     }
   },
 
   logout: () => {
-    set({ user: null, access_token: null, status: 'idle', error: null });
+    set({ user: null, accessToken: null, status: 'idle', error: null });
     localStorage.removeItem('user');
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   },
 }));

@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import UserList from '../../components/UserList';
 import Dashboard from '../../components/admin/Dashboard';
 import FormUser from '../../components/FormUser';
+import { IoMdLogOut } from 'react-icons/io';
 
 const AdminPainel: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -91,19 +92,25 @@ const AdminPainel: React.FC = () => {
       </div>
 
       {/* --- Menu Lateral (Sidebar) --- */}
+      <div
+        className={`bg-black w-full h-full opacity-25 z-40 ${isMenuOpen ? 'fixed' : 'hidden'}`}
+        onClick={toggleMenu}
+      ></div>
       <aside
         className={`
           transform transition-transform duration-300 ease-in-out
-          bg-green-800 text-white w-64 p-4
+          bg-green-800 text-white p-4
           fixed inset-y-0 left-0 z-50
+          w-3/4
+          md:w-64
           md:translate-x-0
           md:sticky md:top-0 md:h-screen
           ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           dark:bg-accent-dark dark:text-white
         `}
       >
-        <nav>
-          <ul className="flex flex-col space-y-2">
+        <nav className="h-full">
+          <ul className="flex flex-col space-y-2 h-full">
             <li>
               <a
                 id="dashboard"
@@ -157,12 +164,12 @@ const AdminPainel: React.FC = () => {
                 Configurações
               </a>
             </li>
-            <li>
+            <li className="mt-auto">
               <a
                 onClick={logout}
-                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
+                className="cursor-pointer text-2xl block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
               >
-                Sair
+                <IoMdLogOut />
               </a>
             </li>
           </ul>
@@ -170,7 +177,7 @@ const AdminPainel: React.FC = () => {
       </aside>
 
       {/* --- Conteúdo Principal --- */}
-      <main className="flex-1 p-8 md:ml-0  overflow-y-auto  bg-gray-100 dark:bg-primary-dark">
+      <main className="flex-1 pt-4 sm:p-8 md:ml-0  overflow-y-auto  bg-gray-100 dark:bg-primary-dark">
         {showUserList && <UserList />}
         {showDashboard && <Dashboard />}
         {showUserAdd && <FormUser />}

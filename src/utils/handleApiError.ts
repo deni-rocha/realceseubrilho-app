@@ -1,16 +1,23 @@
+import revalidateToken from './revalidateToken';
+
 export interface ApiError {
   message: string;
   code: string;
   status: number;
 }
 
-const handleApiError = (error: unknown): string => {
+const handleApiError = async (error: unknown): Promise<string> => {
+  const errorMessage = (error as ApiError).message;
   const status = (error as ApiError).status;
 
   switch (status) {
     case 400:
       return 'Requisição inválida. Verifique os dados enviados.';
     case 401:
+      if (errorMessage === 'Refresh token inválido ou expirado') {
+        return 'Sessão expirada';
+      }
+      await revalidateToken();
       return 'Não autorizado. Verifique suas credenciais.';
     case 403:
       return 'Acesso proibido. Você não tem permissão para acessar este recurso.';

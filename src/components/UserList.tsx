@@ -6,6 +6,7 @@ import UserCard from './UserCard';
 import UserCardDetails from './UserCardDetails';
 import { IoChevronBack } from 'react-icons/io5';
 import { FaSearch } from 'react-icons/fa';
+import { LuRefreshCw } from 'react-icons/lu';
 
 const UserList: React.FC = () => {
   // O useQuery aceita uma "chave" única (users) e uma função assíncrona
@@ -37,7 +38,7 @@ const UserList: React.FC = () => {
   // Se a requisição foi bem-sucedida, data não é undefined
 
   return (
-    <div className="border p-6 rounded-lg shadow-md bg-gray-100 dark:bg-secondary-dark">
+    <div className="p-6 rounded-lg shadow-md bg-gray-100 dark:bg-accent-dark">
       {userCardDetails.active ? (
         <div className="w-full mb-4 flex justify-between border-b border-gray-300 dark:border-gray-700">
           <button
@@ -60,12 +61,13 @@ const UserList: React.FC = () => {
           <div className="flex items-center justify-between">
             <button
               onClick={() => refetch()}
-              className="mb-4 px-2 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-800 lg:mb-4 lg:px-4 lg:py-2"
+              className="flex items-center gap-2 mb-4 px-4 py-2 h-10 cursor-pointer bg-green-600 text-white rounded hover:bg-green-800 lg:mb-4 lg:px-4 lg:py-2"
             >
-              Atualizar Lista
+              <span className="font-bold"> Atualizar</span>
+              <LuRefreshCw />
             </button>
 
-            <button className="mb-4 ml-4 px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-800">
+            <button className="mb-4 ml-4 px-4 py-2 h-10 cursor-pointer bg-green-600 text-white rounded hover:bg-green-800">
               <FaSearch />
             </button>
           </div>
