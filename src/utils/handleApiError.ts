@@ -1,14 +1,8 @@
-import revalidateToken from './revalidateToken';
+import type { ApiError } from '../types/ApiError';
 
-export interface ApiError {
-  message: string;
-  code: string;
-  status: number;
-}
-
-const handleApiError = async (error: unknown): Promise<string> => {
-  const errorMessage = (error as ApiError).message;
-  const status = (error as ApiError).status;
+const handleApiError = (error: ApiError) => {
+  const errorMessage = error.message;
+  const status = error.status;
 
   switch (status) {
     case 400:
@@ -17,7 +11,6 @@ const handleApiError = async (error: unknown): Promise<string> => {
       if (errorMessage === 'Refresh token inválido ou expirado') {
         return 'Sessão expirada';
       }
-      await revalidateToken();
       return 'Não autorizado. Verifique suas credenciais.';
     case 403:
       return 'Acesso proibido. Você não tem permissão para acessar este recurso.';

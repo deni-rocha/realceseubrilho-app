@@ -1,9 +1,12 @@
 import { useState, type Dispatch } from 'react';
 import type { UserDetails } from '../types/UserDetails';
 import { RiDeleteBin5Line } from 'react-icons/ri';
-import { FaArrowRight, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import api from '../api';
 import { toast } from 'react-toastify';
+import type { ApiError } from '../types/ApiError';
+import handleApiError from '../utils/handleApiError';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface UserCardProps {
   user: UserDetails;
@@ -17,14 +20,27 @@ interface UserCardProps {
 
 const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
   const [selectedRole, setSelectedRole] = useState(user.role.name);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
   const handleClose = () => {
     setUserCardDetails({ active: false, userId: null });
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const deleteUser = async () => {
+    try {
+      if (user.id === 'f4c81fea-be74-4235-b7dc-2361a3fec9b6')
+        return toast.error('Não é possível deletar esse usuário');
 
-  const deleteUser = () => {
-    // Lógica para deletar o usuário
+      await api.delete(`users/${user.id}`);
+
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+
+      toast.success('Usuário deletado com sucesso!');
+      handleClose();
+    } catch (error) {
+      toast.error(handleApiError(error as ApiError));
+    }
   };
 
   const handleSave = async () => {
@@ -52,12 +68,12 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
   return (
     <div className="relative p-6 bg-white dark:bg-accent-dark rounded-lg shadow-md w-[500px] h-auto border border-gray-200 dark:border-gray-700">
       <div className="flex justify-between items-start mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+        <h2 className=" text-lg md:text-2xl font-semibold text-gray-900 dark:text-white">
           {user.name}
         </h2>
         <button
           onClick={deleteUser}
-          className="cursor-pointer text-gray-500 hover:text-green-600 transition-colors duration-200"
+          className="cursor-pointer text-gray-500 dark:text-gray-300 hover:text-green-600 transition-colors duration-200"
           aria-label="Deletar usuário"
         >
           <RiDeleteBin5Line className="h-6 w-6" />
@@ -94,12 +110,12 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
           </p>
         </div>
 
-        <div className="flex justify-end space-x-2 mt-4">
+        <div className="flex justify-end space-x-2 mt-4 text-sm md:text-md">
           <button
             onClick={handleSave}
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center justify-center px-8 py-3 text-white font-semibold bg-gradient-to-r bg-green-600 hover:bg-green-800 rounded-lg shadow-lg focus:outline-none focus:ring-4 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:cursor-not-allowed "
+            className="flex items-center justify-center px-4 md:px-8 py-3 text-white font-semibold bg-gradient-to-r bg-green-600 hover:bg-green-800 rounded-lg shadow-lg focus:outline-none focus:ring-4 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:cursor-not-allowed "
           >
             {isSubmitting ? (
               <>
@@ -112,7 +128,7 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
           </button>
           <button
             onClick={handleClose}
-            className="cursor-pointer px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            className="cursor-pointer px-4 font-bold py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Fechar
           </button>

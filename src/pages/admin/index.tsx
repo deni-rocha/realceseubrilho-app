@@ -5,6 +5,7 @@ import UserList from '../../components/UserList';
 import Dashboard from '../../components/admin/Dashboard';
 import FormUser from '../../components/FormUser';
 import { IoMdLogOut } from 'react-icons/io';
+import AdmSettings from '../../components/admin/AdmSettings';
 
 const AdminPainel: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +30,8 @@ const AdminPainel: React.FC = () => {
     v: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     let id = v.currentTarget.id;
+
+    toggleMenu();
 
     switch (id) {
       case 'dashboard':
@@ -93,7 +96,7 @@ const AdminPainel: React.FC = () => {
 
       {/* --- Menu Lateral (Sidebar) --- */}
       <div
-        className={`bg-black w-full h-full opacity-25 z-40 ${isMenuOpen ? 'fixed' : 'hidden'}`}
+        className={`bg-black w-full h-full opacity-25 z-40 md:hidden ${isMenuOpen ? 'fixed' : 'hidden'}`}
         onClick={toggleMenu}
       ></div>
       <aside
@@ -181,11 +184,7 @@ const AdminPainel: React.FC = () => {
         {showUserList && <UserList />}
         {showDashboard && <Dashboard />}
         {showUserAdd && <FormUser />}
-        {showSettings && (
-          <div className="dark:text-white">
-            Configurações - Em Desenvolvimento
-          </div>
-        )}
+        {showSettings && <AdmSettings />}
         {showLogout && <div className="dark:text-white">Saindo...</div>}
       </main>
     </div>

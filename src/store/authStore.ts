@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { login } from '../api/auth';
 import type { UserAuth } from '../types/UserAuth';
 import handleApiError from '../utils/handleApiError';
+import type { ApiError } from '../types/ApiError';
 
 interface AuthState {
   user: UserAuth | null;
@@ -39,7 +40,7 @@ export const useAuthStore = create<AuthState>((set, _get) => ({
         localStorage.setItem('refreshToken', response.data.refreshToken);
       }
     } catch (error) {
-      const message = await handleApiError(error);
+      const message = handleApiError(error as ApiError);
       set({ status: 'failed', error: message });
     }
   },

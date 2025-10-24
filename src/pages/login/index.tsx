@@ -3,7 +3,6 @@ import { FaUser, FaLock, FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
-import handleApiError from '../../utils/handleApiError';
 
 const Login = () => {
   const [data, setData] = useState({ email: '', password: '' });
