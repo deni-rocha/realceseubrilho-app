@@ -1,20 +1,48 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
-import UserList from '../../components/UserList';
+import UserList from '../../components/admin/UserList';
 import Dashboard from '../../components/admin/Dashboard';
 import FormUser from '../../components/FormUser';
 import { IoMdLogOut } from 'react-icons/io';
 import AdmSettings from '../../components/admin/AdmSettings';
+import FormProduct from '../../components/admin/FormProduct';
+import ProductList from '../../components/admin/ProductList';
+import CategoryList from '../../components/admin/CategoryList';
+import FormCategory from '../../components/admin/FormCategory';
+
+type ActiveMenuItem =
+  | 'dashboard'
+  | 'users'
+  | 'user-list'
+  | 'user-add'
+  | 'products'
+  | 'product-list'
+  | 'product-add'
+  | 'categories'
+  | 'category-list'
+  | 'category-add'
+  | 'settings'
+  | 'logout'
+  | null;
 
 const AdminPainel: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUsersDropdownOpen, setIsUsersDropdownOpen] = useState(false);
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [isCategoriesDropdownOpen, setIsCategoriesDropdownOpen] =
+    useState(false);
+  const [activeMenuItem, setActiveMenuItem] =
+    useState<ActiveMenuItem>('dashboard');
   const [showDashboard, setShowDashboard] = useState(true);
   const [showUserList, setShowUserList] = useState(false);
   const [showUserAdd, setShowUserAdd] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
+  const [showProductList, setShowProductList] = useState(false);
+  const [showProductAdd, setShowProductAdd] = useState(false);
+  const [showCategoryList, setShowCategoryList] = useState(false);
+  const [showCategoryAdd, setShowCategoryAdd] = useState(false);
 
   const { logout } = useAuthStore();
 
@@ -24,52 +52,83 @@ const AdminPainel: React.FC = () => {
 
   const toggleUsersDropdown = () => {
     setIsUsersDropdownOpen(!isUsersDropdownOpen);
+    setActiveMenuItem('users');
+  };
+
+  const toggleProductsDropdown = () => {
+    setIsProductsDropdownOpen(!isProductsDropdownOpen);
+    setActiveMenuItem('products');
+  };
+
+  const toggleCategoriesDropdown = () => {
+    setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
+  };
+
+  const resetAllViews = () => {
+    setShowDashboard(false);
+    setShowUserList(false);
+    setShowUserAdd(false);
+    setShowSettings(false);
+    setShowLogout(false);
+    setShowProductList(false);
+    setShowProductAdd(false);
+    setShowCategoryList(false);
+    setShowCategoryAdd(false);
+  };
+
+  const getMenuItemClasses = (menuItem: ActiveMenuItem) => {
+    const baseClasses =
+      'cursor-pointer block p-2 rounded-md transition-colors duration-200';
+    const activeClasses = 'bg-green-600 text-white dark:bg-gray-600';
+    const hoverClasses = 'hover:bg-green-700 dark:hover:bg-gray-700';
+
+    return `${baseClasses} ${activeMenuItem === menuItem ? activeClasses : ''} ${hoverClasses}`;
+  };
+
+  const getDropdownButtonClasses = (menuItem: ActiveMenuItem) => {
+    const baseClasses =
+      'flex items-center justify-between w-full p-2 rounded-md transition-colors duration-200 focus:outline-none';
+    const activeClasses = 'bg-green-600 dark:bg-gray-600';
+    const hoverClasses = 'hover:bg-green-700 dark:hover:bg-gray-700';
+
+    return `${baseClasses} ${activeMenuItem === menuItem ? activeClasses : ''} ${hoverClasses}`;
   };
 
   const toggleOptionsMenu = (
     v: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
-    let id = v.currentTarget.id;
-
+    let id = v.currentTarget.id as ActiveMenuItem;
     toggleMenu();
+    resetAllViews();
+    setActiveMenuItem(id);
 
     switch (id) {
       case 'dashboard':
         setShowDashboard(true);
-        setShowUserList(false);
-        setShowUserAdd(false);
-        setShowSettings(false);
-        setShowLogout(false);
         break;
       case 'user-list':
-        setShowDashboard(false);
         setShowUserList(true);
-        setShowUserAdd(false);
-        setShowSettings(false);
-        setShowLogout(false);
         break;
       case 'user-add':
-        setShowDashboard(false);
-        setShowUserList(false);
         setShowUserAdd(true);
-        setShowSettings(false);
-        setShowLogout(false);
+        break;
+      case 'product-list':
+        setShowProductList(true);
+        break;
+      case 'product-add':
+        setShowProductAdd(true);
+        break;
+      case 'category-list':
+        setShowCategoryList(true);
+        break;
+      case 'category-add':
+        setShowCategoryAdd(true);
         break;
       case 'settings':
-        setShowDashboard(false);
-        setShowUserList(false);
-        setShowUserAdd(false);
         setShowSettings(true);
-        setShowLogout(false);
         break;
       case 'logout':
-        setShowDashboard(false);
-        setShowUserList(false);
-        setShowUserAdd(false);
-        setShowSettings(false);
         setShowLogout(true);
-        break;
-      default:
         break;
     }
   };
@@ -118,19 +177,23 @@ const AdminPainel: React.FC = () => {
               <a
                 id="dashboard"
                 onClick={toggleOptionsMenu}
-                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
+                className={getMenuItemClasses('dashboard')}
               >
                 Dashboard
               </a>
             </li>
+
+            {/* Seção de Usuários */}
             <li className="relative">
               <button
                 onClick={toggleUsersDropdown}
-                className="flex items-center justify-between w-full p-2 rounded-md hover:bg-green-700 focus:outline-none dark:hover:bg-gray-700"
+                className={getDropdownButtonClasses('users')}
               >
                 <span>Usuários</span>
                 <span
-                  className={`transform transition-transform ${isUsersDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                  className={`transform transition-transform duration-200 ${
+                    isUsersDropdownOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
                 >
                   ▼
                 </span>
@@ -141,7 +204,7 @@ const AdminPainel: React.FC = () => {
                     <a
                       id="user-list"
                       onClick={toggleOptionsMenu}
-                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-green-700 dark:hover:bg-gray-700"
+                      className={getMenuItemClasses('user-list')}
                     >
                       Lista de Usuários
                     </a>
@@ -150,7 +213,7 @@ const AdminPainel: React.FC = () => {
                     <a
                       id="user-add"
                       onClick={toggleOptionsMenu}
-                      className="cursor-pointer block p-2 rounded-md text-sm hover:bg-green-700 dark:hover:bg-gray-700"
+                      className={getMenuItemClasses('user-add')}
                     >
                       Adicionar Novo
                     </a>
@@ -158,11 +221,90 @@ const AdminPainel: React.FC = () => {
                 </ul>
               )}
             </li>
+
+            {/* Seção de Produtos */}
+            <li className="relative">
+              <button
+                onClick={toggleProductsDropdown}
+                className={getDropdownButtonClasses('products')}
+              >
+                <span>Produtos</span>
+                <span
+                  className={`transform transition-transform duration-200 ${
+                    isProductsDropdownOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                >
+                  ▼
+                </span>
+              </button>
+              {isProductsDropdownOpen && (
+                <ul className="pl-4 mt-2 space-y-1">
+                  <li>
+                    <a
+                      id="product-list"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('product-list')}
+                    >
+                      Lista de Produtos
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      id="product-add"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('product-add')}
+                    >
+                      Adicionar Produto
+                    </a>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            {/* Seção de Categorias */}
+            <li className="relative">
+              <button
+                onClick={toggleCategoriesDropdown}
+                className={getDropdownButtonClasses('categories')}
+              >
+                <span>Categorias</span>
+                <span
+                  className={`transform transition-transform ${
+                    isCategoriesDropdownOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                >
+                  ▼
+                </span>
+              </button>
+              {isCategoriesDropdownOpen && (
+                <ul className="pl-4 mt-2 space-y-1">
+                  <li>
+                    <a
+                      id="category-list"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('category-list')}
+                    >
+                      Lista de Categorias
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      id="category-add"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('category-add')}
+                    >
+                      Adicionar Categoria
+                    </a>
+                  </li>
+                </ul>
+              )}
+            </li>
+
             <li>
               <a
                 id="settings"
                 onClick={toggleOptionsMenu}
-                className="cursor-pointer block p-2 rounded-md hover:bg-green-700 dark:hover:bg-gray-700"
+                className={getMenuItemClasses('settings')}
               >
                 Configurações
               </a>
@@ -180,10 +322,14 @@ const AdminPainel: React.FC = () => {
       </aside>
 
       {/* --- Conteúdo Principal --- */}
-      <main className="flex-1 pt-4 sm:p-8 md:ml-0  overflow-y-auto  bg-gray-100 dark:bg-primary-dark">
-        {showUserList && <UserList />}
+      <main className="flex-1 pt-4 sm:p-8 md:ml-0 overflow-y-auto bg-gray-100 dark:bg-primary-dark">
         {showDashboard && <Dashboard />}
+        {showUserList && <UserList />}
         {showUserAdd && <FormUser />}
+        {showProductList && <ProductList />}
+        {showProductAdd && <FormProduct />}
+        {showCategoryList && <CategoryList />}
+        {showCategoryAdd && <FormCategory />}
         {showSettings && <AdmSettings />}
         {showLogout && <div className="dark:text-white">Saindo...</div>}
       </main>

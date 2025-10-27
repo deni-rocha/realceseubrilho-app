@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import type { User } from '../types/User';
 import api from '../api';
-import type { ApiError } from '../utils/handleApiError';
+import type { ApiError } from '../types/ApiError';
 
 // 1. Definição do Esquema de Validação com Zod
 const formSchema = z
