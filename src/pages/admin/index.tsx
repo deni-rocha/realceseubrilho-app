@@ -133,12 +133,41 @@ const AdminPainel: React.FC = () => {
     }
   };
 
+  const getTitleByActiveMenuItem = (activeItem: ActiveMenuItem): string => {
+    switch (activeItem) {
+      case 'dashboard':
+        return 'Dashboard';
+      case 'users':
+        return 'Usuários';
+      case 'user-list':
+        return 'Lista de Usuários';
+      case 'user-add':
+        return 'Adicionar Usuário';
+      case 'products':
+        return 'Produtos';
+      case 'product-list':
+        return 'Lista de Produtos';
+      case 'product-add':
+        return 'Adicionar Produto';
+      case 'categories':
+        return 'Categorias';
+      case 'category-list':
+        return 'Lista de Categorias';
+      case 'category-add':
+        return 'Adicionar Categoria';
+      case 'settings':
+        return 'Configurações';
+      default:
+        return 'Dashboard';
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-primary-dark">
       {/* --- Cabeçalho Mobile --- */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm z-10 dark:bg-accent-dark dark:border-gray-700">
         <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-          Painel Administrativo
+          {getTitleByActiveMenuItem(activeMenuItem)}
         </h1>
         <button
           onClick={toggleMenu}

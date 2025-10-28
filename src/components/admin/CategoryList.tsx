@@ -67,7 +67,7 @@ const CategoryList: React.FC = () => {
 
   return (
     <div className="p-6 rounded-lg shadow-md bg-gray-100 dark:bg-accent-dark">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white hidden md:block">
         Lista de Categorias
       </h1>
 

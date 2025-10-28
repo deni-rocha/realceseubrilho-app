@@ -43,7 +43,7 @@ const FormCategory: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 dark:bg-accent-dark rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white hidden md:block">
         Adicionar Nova Categoria
       </h2>
 

@@ -154,7 +154,7 @@ const ProductList: React.FC = () => {
       ) : (
         // ... resto do código existente ...
         <>
-          <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+          <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white hidden md:block">
             Lista de Produtos
           </h1>
 

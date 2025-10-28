@@ -71,7 +71,7 @@ const UserList: React.FC = () => {
         </div>
       ) : (
         <>
-          <h1 className="text-lg font-bold mb-4 dark:text-white lg:text-2xl">
+          <h1 className="text-lg font-bold mb-4 dark:text-white lg:text-2xl hidden md:block">
             Lista de Usuários
           </h1>
 
