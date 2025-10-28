@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import api from '../../api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
+import { FaImage, FaTimes } from 'react-icons/fa';
+import type { ResponseCreateProduct } from '../../types/createProduct.ts/ResponseCreateProduct';
 
 // Interface para categoria
 interface Category {
@@ -31,12 +33,16 @@ const productSchema = z.object({
     .min(0, 'O preço não pode ser negativo')
     .multipleOf(0.01, 'O preço deve ter no máximo 2 casas decimais'),
   categoryId: z.string().min(1, 'Selecione uma categoria'),
+  image: z.any().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
 
 const FormProduct: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCategories = async (): Promise<Category[]> => {
     const response = await api.get<Category[]>('/product-category');
@@ -60,12 +66,79 @@ const FormProduct: React.FC = () => {
     resolver: zodResolver(productSchema),
   });
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB
+        toast.error('A imagem deve ter no máximo 5MB');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast.error('O arquivo deve ser uma imagem');
+        return;
+      }
+
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const onSubmit = async (data: ProductFormData) => {
     try {
       setIsSubmitting(true);
-      await api.post('/products', data);
-      toast.success('Produto adicionado com sucesso!');
-      reset(); // Limpa o formulário
+
+      // Primeiro, criar o produto
+      const productResponse = await api.post<ResponseCreateProduct>(
+        '/products',
+        {
+          name: data.name,
+          description: data.description,
+          stockQuantity: data.stockQuantity,
+          price: data.price,
+          categoryId: data.categoryId,
+        },
+      );
+
+      // Se tiver imagem selecionada, fazer o upload
+      if (selectedImage && productResponse.data.id) {
+        const formData = new FormData();
+        formData.append('file', selectedImage);
+
+        try {
+          await api.post(
+            `/products/${productResponse.data.id}/image`,
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            },
+          );
+          toast.success('Produto e imagem adicionados com sucesso!');
+        } catch (imageError: any) {
+          toast.error('Produto criado, mas houve um erro ao enviar a imagem');
+          console.error('Erro ao enviar imagem:', imageError);
+        }
+      } else {
+        toast.success('Produto adicionado com sucesso!');
+      }
+
+      reset();
+      removeImage();
     } catch (error: any) {
       const message =
         error.response?.data?.message || 'Erro ao adicionar produto';
@@ -82,6 +155,55 @@ const FormProduct: React.FC = () => {
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Campo de Upload de Imagem */}
+        <div>
+          <label
+            htmlFor="image"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2"
+          >
+            Imagem do Produto
+          </label>
+          <div className="flex flex-col items-center space-y-4">
+            {imagePreview ? (
+              <div className="relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-64 h-64 object-cover rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                >
+                  <FaTimes className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="w-64 h-64 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FaImage className="w-12 h-12 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Clique para adicionar uma imagem
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  PNG, JPG até 5MB
+                </p>
+              </div>
+            )}
+            <input
+              type="file"
+              id="image"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+        </div>
+
         {/* Nome do Produto */}
         <div>
           <label
@@ -211,7 +333,7 @@ const FormProduct: React.FC = () => {
             disabled={isSubmitting || isCategoriesLoading}
             className={`w-full px-4 py-2 text-white font-medium rounded-md shadow-sm
               ${
-                isSubmitting
+                isSubmitting || isCategoriesLoading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
               }`}
