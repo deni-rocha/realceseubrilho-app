@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import UserList from '../../components/admin/UserList';
@@ -43,6 +43,7 @@ const AdminPainel: React.FC = () => {
   const [showProductAdd, setShowProductAdd] = useState(false);
   const [showCategoryList, setShowCategoryList] = useState(false);
   const [showCategoryAdd, setShowCategoryAdd] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const { logout } = useAuthStore();
 
@@ -75,6 +76,20 @@ const AdminPainel: React.FC = () => {
     setShowCategoryList(false);
     setShowCategoryAdd(false);
   };
+
+  // Detecta o scroll para adicionar sombra
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const getMenuItemClasses = (menuItem: ActiveMenuItem) => {
     const baseClasses =
@@ -165,7 +180,11 @@ const AdminPainel: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-primary-dark">
       {/* --- Cabeçalho Mobile --- */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm z-10 dark:bg-accent-dark dark:border-gray-700">
+      <div
+        className={`md:hidden fixed top-0 left-0 right-0 w-full flex items-center justify-between p-4 bg-white border-b border-gray-200 z-10 dark:bg-accent-dark dark:border-gray-700 transition-shadow duration-300 ${
+          isScrolled ? 'shadow-md' : 'shadow-sm'
+        }`}
+      >
         <h1 className="text-xl font-bold text-gray-800 dark:text-white">
           {getTitleByActiveMenuItem(activeMenuItem)}
         </h1>
@@ -351,7 +370,7 @@ const AdminPainel: React.FC = () => {
       </aside>
 
       {/* --- Conteúdo Principal --- */}
-      <main className="flex-1 pt-4 sm:p-8 md:ml-0 overflow-y-auto bg-gray-100 dark:bg-primary-dark">
+      <main className="mt-8 flex-1 pt-4 sm:p-8 md:ml-0 overflow-y-auto bg-gray-100 dark:bg-primary-dark">
         {showDashboard && <Dashboard />}
         {showUserList && <UserList />}
         {showUserAdd && <FormUser />}

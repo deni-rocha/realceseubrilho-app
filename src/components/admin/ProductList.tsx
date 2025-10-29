@@ -139,7 +139,7 @@ const ProductList: React.FC = () => {
   return (
     <div className="p-6 rounded-lg shadow-md bg-gray-100 dark:bg-accent-dark">
       {editingProductId ? (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-accent-dark flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
               Editar Produto
