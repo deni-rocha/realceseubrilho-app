@@ -5,13 +5,20 @@ import api from '../../api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
-import { FaImage, FaTimes } from 'react-icons/fa';
+import { FaImage, FaTimes, FaPlus } from 'react-icons/fa';
 import type { ResponseCreateProduct } from '../../types/createProduct.ts/ResponseCreateProduct';
 
 // Interface para categoria
 interface Category {
   id: string;
   name: string;
+}
+
+// Interface para imagens
+interface ImageFile {
+  file: File;
+  preview: string;
+  id: string;
 }
 
 // Schema de validação
@@ -38,10 +45,12 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
+const MAX_IMAGES = 5;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 const FormProduct: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCategories = async (): Promise<Category[]> => {
@@ -67,31 +76,65 @@ const FormProduct: React.FC = () => {
   });
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        // 5MB
-        toast.error('A imagem deve ter no máximo 5MB');
-        return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newImages: ImageFile[] = [];
+    const remainingSlots = MAX_IMAGES - selectedImages.length;
+
+    if (files.length > remainingSlots) {
+      toast.warning(
+        `Você pode adicionar no máximo ${remainingSlots} imagem(ns) a mais`,
+      );
+    }
+
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+    for (const file of filesToProcess) {
+      // Validar tamanho do arquivo
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`A imagem "${file.name}" excede o tamanho máximo de 5MB`);
+        continue;
       }
 
+      // Validar tipo de arquivo
       if (!file.type.startsWith('image/')) {
-        toast.error('O arquivo deve ser uma imagem');
-        return;
+        toast.error(`O arquivo "${file.name}" não é uma imagem válida`);
+        continue;
       }
 
-      setSelectedImage(file);
+      // Criar preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        const imageFile: ImageFile = {
+          file,
+          preview: reader.result as string,
+          id: `${Date.now()}-${Math.random()}`,
+        };
+
+        setSelectedImages((prev) => {
+          // Verificar se não excede o limite
+          if (prev.length >= MAX_IMAGES) {
+            return prev;
+          }
+          return [...prev, imageFile];
+        });
       };
       reader.readAsDataURL(file);
     }
+
+    // Limpar o input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
+  const removeImage = (id: string) => {
+    setSelectedImages((prev) => prev.filter((img) => img.id !== id));
+  };
+
+  const removeAllImages = () => {
+    setSelectedImages([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -113,32 +156,45 @@ const FormProduct: React.FC = () => {
         },
       );
 
-      // Se tiver imagem selecionada, fazer o upload
-      if (selectedImage && productResponse.data.id) {
-        const formData = new FormData();
-        formData.append('file', selectedImage);
+      // Se tiver imagens selecionadas, fazer o upload de todas
+      if (selectedImages.length > 0 && productResponse.data.id) {
+        const uploadPromises = selectedImages.map(async (imageFile, index) => {
+          const formData = new FormData();
+          formData.append('file', imageFile.file);
+
+          try {
+            await api.post(
+              `/products/${productResponse.data.id}/image`,
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              },
+            );
+          } catch (error) {
+            console.error(`Erro ao enviar imagem ${index + 1}:`, error);
+            throw error;
+          }
+        });
 
         try {
-          await api.post(
-            `/products/${productResponse.data.id}/image`,
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            },
+          await Promise.all(uploadPromises);
+          toast.success(
+            `Produto e ${selectedImages.length} imagem(ns) adicionados com sucesso!`,
           );
-          toast.success('Produto e imagem adicionados com sucesso!');
         } catch (imageError: any) {
-          toast.error('Produto criado, mas houve um erro ao enviar a imagem');
-          console.error('Erro ao enviar imagem:', imageError);
+          toast.warning(
+            'Produto criado, mas houve erro ao enviar algumas imagens',
+          );
+          console.error('Erro ao enviar imagens:', imageError);
         }
       } else {
         toast.success('Produto adicionado com sucesso!');
       }
 
       reset();
-      removeImage();
+      removeAllImages();
     } catch (error: any) {
       const message =
         error.response?.data?.message || 'Erro ao adicionar produto';
@@ -155,53 +211,97 @@ const FormProduct: React.FC = () => {
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Campo de Upload de Imagem */}
+        {/* Campo de Upload de Múltiplas Imagens */}
         <div>
-          <label
-            htmlFor="image"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2"
-          >
-            Imagem do Produto
-          </label>
-          <div className="flex flex-col items-center space-y-4">
-            {imagePreview ? (
-              <div className="relative">
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="images"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Imagens do Produto
+            </label>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {selectedImages.length}/{MAX_IMAGES} imagens
+            </span>
+          </div>
+
+          {/* Grid de Imagens */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {/* Imagens Selecionadas */}
+            {selectedImages.map((imageFile) => (
+              <div key={imageFile.id} className="relative group">
                 <img
-                  src={imagePreview}
+                  src={imageFile.preview}
                   alt="Preview"
-                  className="w-64 h-64 object-cover rounded-lg"
+                  className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600"
                 />
                 <button
                   type="button"
-                  onClick={removeImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  onClick={() => removeImage(imageFile.id)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                  title="Remover imagem"
                 >
-                  <FaTimes className="w-4 h-4" />
+                  <FaTimes className="w-3 h-3" />
                 </button>
+                {/* Indicador de imagem principal (primeira imagem) */}
+                {selectedImages[0].id === imageFile.id && (
+                  <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                    Principal
+                  </div>
+                )}
               </div>
-            ) : (
+            ))}
+
+            {/* Botão para Adicionar Mais Imagens */}
+            {selectedImages.length < MAX_IMAGES && (
               <div
-                className="w-64 h-64 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-colors"
+                className="w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <FaImage className="w-12 h-12 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Clique para adicionar uma imagem
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  PNG, JPG até 5MB
+                <FaPlus className="w-6 h-6 text-gray-400 mb-1" />
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center px-2">
+                  Adicionar
                 </p>
               </div>
             )}
-            <input
-              type="file"
-              id="image"
-              ref={fileInputRef}
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
           </div>
+
+          {/* Input File Oculto */}
+          <input
+            type="file"
+            id="images"
+            ref={fileInputRef}
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageChange}
+          />
+
+          {/* Informações e Botão de Limpar */}
+          <div className="mt-3 flex items-center justify-between">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              PNG, JPG até 5MB cada • Máximo de {MAX_IMAGES} imagens
+            </p>
+            {selectedImages.length > 0 && (
+              <button
+                type="button"
+                onClick={removeAllImages}
+                className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium"
+              >
+                Remover todas
+              </button>
+            )}
+          </div>
+
+          {/* Dica sobre imagem principal */}
+          {selectedImages.length > 0 && (
+            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                💡 <strong>Dica:</strong> A primeira imagem será usada como
+                imagem principal do produto.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Nome do Produto */}
