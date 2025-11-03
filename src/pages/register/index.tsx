@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import type { User } from '../../types/User';
 import api from '../../api';
-import type { ApiError } from '../../utils/handleApiError';
+import type { ApiError } from '../../types/ApiError';
 
 // 1. Definição do Esquema de Validação com Zod
 const formSchema = z
@@ -58,7 +58,8 @@ const FormUser: React.FC = () => {
         email: data.email,
         password: data.password,
       };
-      const response = await api.post<User>('/auth/register', userToRegister);
+
+      await api.post<User>('/auth/register', userToRegister);
 
       toast.success('Usuário cadastrado com sucesso!');
     } catch (err) {
