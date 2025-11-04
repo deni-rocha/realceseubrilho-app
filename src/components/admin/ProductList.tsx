@@ -7,16 +7,24 @@ import { toast } from 'react-toastify';
 import api from '../../api';
 import EditProductForm from './EditProductForm';
 
-interface Product {
+interface IProductCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IProduct {
   id: string;
   name: string;
   description: string;
+  price: string;
   stockQuantity: number;
-  price: number;
-  category: {
-    id: string;
-    name: string;
-  };
+  imageUrls: string[];
+  createdAt: string;
+  updatedAt: string;
+  category: IProductCategory;
 }
 
 const ProductList: React.FC = () => {
@@ -33,18 +41,10 @@ const ProductList: React.FC = () => {
   } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await api.get<Product[]>('/products');
+      const response = await api.get<IProduct[]>('/products');
       return response.data;
     },
   });
-
-  // Função para formatar preço
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(price);
-  };
 
   // Filtrar produtos
   const filteredProducts = useMemo(() => {
@@ -69,12 +69,11 @@ const ProductList: React.FC = () => {
 
   const handleEditSuccess = () => {
     setEditingProductId(null);
-    refetch(); // Atualiza a lista de produtos
+    refetch();
   };
 
   // Função para deletar produto
   const handleDelete = async (productId: string) => {
-    // Criando uma Promise que será resolvida apenas quando o usuário confirmar
     const deletePromise = new Promise((resolve, reject) => {
       toast.warning(
         ({ closeToast }) => (
@@ -152,7 +151,6 @@ const ProductList: React.FC = () => {
           </div>
         </div>
       ) : (
-        // ... resto do código existente ...
         <>
           <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white hidden md:block">
             Lista de Produtos
@@ -215,43 +213,63 @@ const ProductList: React.FC = () => {
               {filteredProducts?.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-transform hover:scale-[1.02]"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden transition-transform hover:scale-[1.02]"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                      {product.name}
-                    </h3>
-                    <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {formatPrice(product.price)}
-                    </span>
-                  </div>
+                  {/* Imagem do Produto */}
+                  {product.imageUrls && product.imageUrls.length > 0 ? (
+                    <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                      <img
+                        src={product.imageUrls[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <span className="text-gray-400 dark:text-gray-500">
+                        Sem imagem
+                      </span>
+                    </div>
+                  )}
 
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                    {product.description}
-                  </p>
+                  {/* Conteúdo do Card */}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                        {product.name}
+                      </h3>
+                      <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                        {product.price}
+                      </span>
+                    </div>
 
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Categoria: {product.category.name}
-                    </span>
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Estoque: {product.stockQuantity}
-                    </span>
-                  </div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                      {product.description}
+                    </p>
 
-                  <div className="mt-4 flex justify-end gap-2">
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="px-3 py-1 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                    >
-                      Excluir
-                    </button>
-                    <button
-                      onClick={() => handleEdit(product.id)}
-                      className="px-3 py-1 text-sm text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors"
-                    >
-                      Editar
-                    </button>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Categoria: {product.category.name}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Estoque: {product.stockQuantity}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex justify-end gap-2">
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="px-3 py-1 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                      >
+                        Excluir
+                      </button>
+                      <button
+                        onClick={() => handleEdit(product.id)}
+                        className="px-3 py-1 text-sm text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors"
+                      >
+                        Editar
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

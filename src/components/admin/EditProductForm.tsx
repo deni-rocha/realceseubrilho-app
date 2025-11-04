@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { IoMdClose } from 'react-icons/io';
 import api from '../../api';
 import type { ResponseCreateProduct } from '../../types/createProduct.ts/ResponseCreateProduct';
 
@@ -11,10 +12,26 @@ interface Category {
 
 interface Product extends ResponseCreateProduct {}
 
+// Interface para os dados do formulário
+interface ProductFormData {
+  name?: string;
+  description?: string;
+  stockQuantity?: number;
+  price?: string;
+  categoryId?: string;
+}
+
 interface EditProductFormProps {
   productId: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+}
+
+interface ImagePreview {
+  id: string;
+  url: string;
+  file?: File;
+  isNew: boolean;
 }
 
 const EditProductForm: React.FC<EditProductFormProps> = ({
@@ -23,9 +40,9 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
   onCancel,
 }) => {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<Partial<Product>>({});
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [formData, setFormData] = useState<ProductFormData>({});
+  const [images, setImages] = useState<ImagePreview[]>([]);
+  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
 
   // Buscar dados do produto
   const { data: product, isLoading: isLoadingProduct } = useQuery({
@@ -45,30 +62,55 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
     },
   });
 
-  // Mutation para atualizar produto
   const updateProductMutation = useMutation({
-    mutationFn: async (data: Partial<Product>) => {
+    mutationFn: async (data: ProductFormData) => {
       const response = await api.patch(`/products/${productId}`, data);
       return response.data;
     },
     onSuccess: async () => {
-      // Se houver uma nova imagem, faz o upload
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        await api.post(`/products/${productId}/image`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      }
+      try {
+        for (const imageUrl of imagesToRemove) {
+          try {
+            const encodedUrl = encodeURIComponent(imageUrl);
+            await api.delete(
+              `/products/${productId}/image?imageUrl=${encodedUrl}`,
+            );
+          } catch (error) {
+            console.error('Erro ao remover imagem:', error);
+            toast.warning('Algumas imagens não puderam ser removidas');
+          }
+        }
 
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
-      toast.success('Produto atualizado com sucesso!');
-      onSuccess?.();
+        const newImages = images.filter((img) => img.isNew && img.file);
+
+        if (newImages.length === 1) {
+          const imageFormData = new FormData();
+          imageFormData.append('file', newImages[0].file!);
+
+          await api.post(`/products/${productId}/image`, imageFormData);
+        } else if (newImages.length > 1) {
+          const imagesFormData = new FormData();
+          newImages.forEach((image) => {
+            imagesFormData.append('files', image.file!);
+          });
+
+          await api.post(`/products/${productId}/images`, imagesFormData);
+        }
+
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+        queryClient.invalidateQueries({ queryKey: ['product', productId] });
+        toast.success('Produto atualizado com sucesso!');
+        onSuccess?.();
+      } catch (error: any) {
+        console.error('Erro no processo de atualização:', error);
+        toast.error(
+          error.response?.data?.message ||
+            'Erro ao processar imagens. Produto foi atualizado, mas pode haver problemas com as imagens.',
+        );
+      }
     },
     onError: (error: any) => {
+      console.error('Erro ao atualizar produto:', error);
       toast.error(error.response?.data?.message || 'Erro ao atualizar produto');
     },
   });
@@ -81,9 +123,20 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         description: product.description,
         stockQuantity: product.stockQuantity,
         price: product.price,
-        category: product.category,
+        categoryId: product.category?.id, // Mudança aqui: salvar apenas o ID
       });
-      setImagePreview(product.imageUrl || '');
+
+      // Carregar imagens existentes
+      if (product.imageUrls && product.imageUrls.length > 0) {
+        const existingImages: ImagePreview[] = product.imageUrls.map(
+          (url, index) => ({
+            id: `existing-${index}`,
+            url,
+            isNew: false,
+          }),
+        );
+        setImages(existingImages);
+      }
     }
   }, [product]);
 
@@ -95,39 +148,77 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === 'price' || name === 'stockQuantity' ? Number(value) : value,
+      [name]: name === 'stockQuantity' ? Number(value) : value,
     }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImagePreviews: ImagePreview[] = [];
+
+    Array.from(files).forEach((file) => {
       // Validar tipo de arquivo
-      if (!file.type.match(/image\/(jpeg|jpg|png|gif)/i)) {
-        toast.error('Formato de imagem não suportado');
+      if (!file.type.match(/image\/(jpeg|jpg|png|gif|webp)/i)) {
+        toast.error(`Formato não suportado: ${file.name}`);
         return;
       }
       // Validar tamanho (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Imagem muito grande. Máximo 5MB');
+        toast.error(`Imagem muito grande: ${file.name}. Máximo 5MB`);
         return;
       }
 
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      const preview: ImagePreview = {
+        id: `new-${Date.now()}-${Math.random()}`,
+        url: URL.createObjectURL(file),
+        file,
+        isNew: true,
+      };
+      newImagePreviews.push(preview);
+    });
+
+    setImages((prev) => [...prev, ...newImagePreviews]);
+    // Limpar o input para permitir adicionar o mesmo arquivo novamente
+    e.target.value = '';
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    const imageToRemove = images.find((img) => img.id === imageId);
+    if (!imageToRemove) return;
+
+    // Se é uma imagem existente (não nova), adiciona à lista de remoção
+    if (!imageToRemove.isNew) {
+      setImagesToRemove((prev) => [...prev, imageToRemove.url]);
+    }
+
+    // Remove da lista de imagens
+    setImages((prev) => prev.filter((img) => img.id !== imageId));
+
+    // Liberar memória do URL.createObjectURL se for imagem nova
+    if (imageToRemove.isNew && imageToRemove.url) {
+      URL.revokeObjectURL(imageToRemove.url);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProductMutation.mutate({
-      ...formData,
-    });
+
+    // Validar se há pelo menos uma imagem
+    if (images.length === 0) {
+      toast.error('Adicione pelo menos uma imagem ao produto');
+      return;
+    }
+
+    // Enviar apenas os campos esperados pelo backend
+    updateProductMutation.mutate(formData);
   };
 
   if (isLoadingProduct) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="text-gray-700 dark:text-gray-300">Carregando...</div>
+    );
   }
 
   return (
@@ -199,7 +290,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         </label>
         <select
           name="categoryId"
-          value={formData.category?.id || ''}
+          value={formData.categoryId || ''}
           onChange={handleInputChange}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           required
@@ -214,29 +305,73 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Imagem do Produto
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Imagens do Produto
         </label>
-        <div className="mt-2 flex items-center space-x-4">
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="h-32 w-32 object-cover rounded-lg"
+
+        {/* Grid de imagens */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            {images.map((image) => (
+              <div key={image.id} className="relative group">
+                <img
+                  src={image.url}
+                  alt="Preview"
+                  className="h-32 w-full object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                />
+                {/* Badge para indicar imagem nova */}
+                {image.isNew && (
+                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    Nova
+                  </span>
+                )}
+                {/* Botão de remover */}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(image.id)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                  title="Remover imagem"
+                >
+                  <IoMdClose size={20} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Input para adicionar novas imagens */}
+        <div className="mt-2">
+          <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-green-500 dark:hover:border-green-500 transition-colors">
+            <div className="text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Clique para adicionar imagens ou arraste e solte
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                PNG, JPG, GIF até 5MB
+              </p>
+            </div>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              accept="image/*"
+              multiple
+              className="hidden"
             />
-          )}
-          <input
-            type="file"
-            onChange={handleImageChange}
-            accept="image/*"
-            className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-medium
-              file:bg-green-50 file:text-green-700
-              hover:file:bg-green-100
-              dark:file:bg-green-900 dark:file:text-green-300"
-          />
+          </label>
         </div>
       </div>
 

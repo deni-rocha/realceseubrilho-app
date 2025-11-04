@@ -4,10 +4,10 @@ export interface ResponseCreateProduct {
   id: string;
   name: string;
   description: string;
-  price: string; // ou number se converter para decimal
+  price: string;
   stockQuantity: number;
-  imageUrl: string | null;
-  createdAt: string; // ou Date se converter
-  updatedAt: string; // ou Date se converter
+  imageUrls: string[];
+  createdAt: string;
+  updatedAt: string;
   category: ResponseCreateCategory;
 }

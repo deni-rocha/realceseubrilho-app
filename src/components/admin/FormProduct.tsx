@@ -5,7 +5,7 @@ import api from '../../api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
-import { FaImage, FaTimes, FaPlus } from 'react-icons/fa';
+import { FaTimes, FaPlus } from 'react-icons/fa';
 import type { ResponseCreateProduct } from '../../types/createProduct.ts/ResponseCreateProduct';
 
 // Interface para categoria
@@ -79,7 +79,6 @@ const FormProduct: React.FC = () => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    const newImages: ImageFile[] = [];
     const remainingSlots = MAX_IMAGES - selectedImages.length;
 
     if (files.length > remainingSlots) {
