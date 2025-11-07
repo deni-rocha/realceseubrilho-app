@@ -71,10 +71,9 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       try {
         for (const imageUrl of imagesToRemove) {
           try {
-            const encodedUrl = encodeURIComponent(imageUrl);
-            await api.delete(
-              `/products/${productId}/image?imageUrl=${encodedUrl}`,
-            );
+            await api.delete(`/products/${productId}/image`, {
+              params: { imageUrl },
+            });
           } catch (error) {
             console.error('Erro ao remover imagem:', error);
             toast.warning('Algumas imagens não puderam ser removidas');
