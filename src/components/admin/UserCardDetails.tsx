@@ -1,11 +1,11 @@
 import { useState, type Dispatch } from 'react';
-import type { UserDetails } from '../types/UserDetails';
+import type { UserDetails } from '../../types/UserDetails';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { FaSpinner } from 'react-icons/fa';
-import api from '../api';
+import api from '../../api';
 import { toast } from 'react-toastify';
-import type { ApiError } from '../types/ApiError';
-import handleApiError from '../utils/handleApiError';
+import type { ApiError } from '../../types/ApiError';
+import handleApiError from '../../utils/handleApiError';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface UserCardProps {
@@ -28,41 +28,102 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
   };
 
   const deleteUser = async () => {
+    if (user.id === 'f4c81fea-be74-4235-b7dc-2361a3fec9b6') {
+      toast.error('Não é possível deletar esse usuário');
+      return;
+    }
+
+    const deletePromise = new Promise((resolve, reject) => {
+      toast.warning(
+        ({ closeToast }) => (
+          <div>
+            <p className="mb-4">
+              Tem certeza que deseja excluir o usuário{' '}
+              <strong>{user.name}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  closeToast();
+                  reject(new Error('CANCELADO'));
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  closeToast();
+                  resolve(user.id);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          autoClose: false,
+          closeButton: false,
+          closeOnClick: false,
+        },
+      );
+    });
+
     try {
-      if (user.id === 'f4c81fea-be74-4235-b7dc-2361a3fec9b6')
-        return toast.error('Não é possível deletar esse usuário');
+      await deletePromise;
 
-      await api.delete(`users/${user.id}`);
+      // Se chegou aqui, o usuário confirmou
+      const deletionPromise = async () => {
+        await api.delete(`users/${user.id}`);
+        queryClient.invalidateQueries({ queryKey: ['users'] });
+        handleClose();
+      };
 
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-
-      toast.success('Usuário deletado com sucesso!');
-      handleClose();
-    } catch (error) {
-      toast.error(handleApiError(error as ApiError));
+      await toast.promise(deletionPromise(), {
+        pending: 'Excluindo usuário...',
+        success: 'Usuário deletado com sucesso!',
+        error: {
+          render({ data }) {
+            return handleApiError(data as ApiError);
+          },
+        },
+      });
+    } catch (error: any) {
+      // Se o erro é "CANCELADO", não faz nada (usuário cancelou)
+      if (error?.message === 'CANCELADO') {
+        return;
+      }
+      // Outros erros
+      console.error('Erro ao deletar usuário:', error);
     }
   };
 
   const handleSave = async () => {
-    // Lógica para salvar as mudanças do usuário, como a role
     setIsSubmitting(true);
 
     try {
-      api.post(`/users/${user.id}`, {
+      // Atualizar a role do usuário
+      await api.patch(`/users/${user.id}`, {
         role: selectedRole,
       });
 
-      toast.success('Usuário atualizado com sucesso!');
-    } catch (error) {}
+      // Invalidar as queries para atualizar os dados
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', user.id] });
 
-    console.log('Dados salvos:', {
-      userId: user.id,
-      newRole: selectedRole,
-    });
-    setTimeout(() => {
+      toast.success('Usuário atualizado com sucesso!');
+
+      // Fechar o modal após um pequeno delay
+      setTimeout(() => {
+        handleClose();
+      }, 1000);
+    } catch (error) {
+      toast.error(handleApiError(error as ApiError));
+    } finally {
       setIsSubmitting(false);
-      handleClose();
-    }, 2000);
+    }
   };
 
   return (
@@ -73,7 +134,7 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
         </h2>
         <button
           onClick={deleteUser}
-          className="cursor-pointer text-gray-500 dark:text-gray-300 hover:text-green-600 transition-colors duration-200"
+          className="cursor-pointer text-gray-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-200"
           aria-label="Deletar usuário"
         >
           <RiDeleteBin5Line className="h-6 w-6" />
@@ -112,6 +173,12 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
 
         <div className="flex justify-end space-x-2 mt-4 text-sm md:text-md">
           <button
+            onClick={handleClose}
+            className="cursor-pointer px-4 font-bold py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Fechar
+          </button>
+          <button
             onClick={handleSave}
             type="submit"
             disabled={isSubmitting}
@@ -125,12 +192,6 @@ const UserCardDetails = ({ user, setUserCardDetails }: UserCardProps) => {
             ) : (
               <>Salvar</>
             )}
-          </button>
-          <button
-            onClick={handleClose}
-            className="cursor-pointer px-4 font-bold py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            Fechar
           </button>
         </div>
       </div>
