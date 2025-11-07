@@ -90,7 +90,10 @@ const ProductList: React.FC = () => {
                 Cancelar
               </button>
               <button
-                onClick={() => resolve(productId)}
+                onClick={() => {
+                  closeToast();
+                  resolve(productId);
+                }}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Confirmar
