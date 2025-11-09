@@ -29,7 +29,7 @@ const Login = () => {
     return user.role === 'ADMIN' ? (
       <Navigate to="/admin" replace />
     ) : (
-      <Navigate to="/customer" replace />
+      <Navigate to="/home" replace />
     );
   }
 

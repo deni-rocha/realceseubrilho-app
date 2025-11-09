@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import AdminPainel from './pages/admin';
-import CustomerPainel from './pages/customer';
 import Login from './pages/login';
 import Layout from './components/Layout';
 import { PrivateRoute } from './components/routes/PrivateRoute';
@@ -10,6 +9,7 @@ import NotFound from './pages/notFound';
 import RegisterUser from './pages/register';
 import VerifyEmail from './pages/verifyEmail';
 import RequestEmailVerification from './pages/requestEmailVerification';
+import Home from './pages/home';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -22,14 +22,10 @@ function App() {
           <Route
             path="/"
             element={
-              isAuthenticated ? (
-                role === 'ADMIN' ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Navigate to="/customer" replace />
-                )
+              isAuthenticated && role === 'ADMIN' ? (
+                <Navigate to="/admin" replace />
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/home" replace />
               )
             }
           />
@@ -44,14 +40,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="customer"
-            element={
-              <PrivateRoute roleProp="CUSTOMER">
-                <CustomerPainel />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/home" element={<Home />} />
           <Route path="*" element={<NotFound />} />
           <Route path="register-user" element={<RegisterUser />} />
           <Route path="verify-email" element={<VerifyEmail />} />

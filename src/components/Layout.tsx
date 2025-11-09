@@ -1,5 +1,4 @@
 import { ToastContainer } from 'react-toastify';
-import ThemeSwitcher from './ThemeSwitcher';
 import { useThemeStore } from '../store/themeStore';
 import { Outlet } from 'react-router-dom';
 
@@ -8,9 +7,6 @@ const Layout = () => {
 
   return (
     <div className="app">
-      <div className="hidden md:block absolute top-2 right-0 z-20">
-        <ThemeSwitcher />
-      </div>
       <ToastContainer theme={theme} />
 
       {/* Renderiza o componente filho correspondente à rota atual */}
