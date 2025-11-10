@@ -1,10 +1,10 @@
-interface IProductCategory {
+export interface IProductCategory {
   id: string;
   name: string;
   description: string | null;
 }
 
-interface IProduct {
+export interface IProduct {
   id: string;
   name: string;
   description: string;
@@ -17,4 +17,9 @@ interface IProduct {
 export interface CartItem extends IProduct {
   quantity: number;
   selectedSize?: string;
+}
+
+export interface GuestCheckoutData {
+  guestName: string;
+  guestWhatsapp: string;
 }
