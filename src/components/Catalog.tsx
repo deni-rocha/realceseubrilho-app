@@ -84,7 +84,10 @@ const ProductCatalog: React.FC = () => {
   // Extract categories from products
   const categories = useMemo(() => {
     if (!products) return [];
-    const uniqueCategories = new Set(products.map((p) => p.category.name));
+    const uniqueCategories = new Set<string>();
+    products.forEach((p) => {
+      p.categories?.forEach((cat) => uniqueCategories.add(cat.name));
+    });
     return Array.from(uniqueCategories);
   }, [products]);
 
@@ -98,7 +101,8 @@ const ProductCatalog: React.FC = () => {
         .includes(searchTerm.toLowerCase());
       const matchesCategory =
         selectedCategory === 'all' ||
-        product.category.name === selectedCategory;
+        (product.categories &&
+          product.categories.some((cat) => cat.name === selectedCategory));
       return matchesSearch && matchesCategory && product.stockQuantity > 0;
     });
   }, [products, searchTerm, selectedCategory]);
@@ -279,8 +283,8 @@ const ProductCatalog: React.FC = () => {
           mobileActiveTab === 'search' ||
           window.innerWidth >= 1024) && (
           <>
-            {/* Banner Cards - Hide when searching */}
-            {!searchTerm && <BannerCards />}
+            {/* Banner Cards - Hide when searching (mobile) */}
+            {!searchTerm && mobileActiveTab !== 'search' && <BannerCards />}
 
             {/* Category Filter */}
             <CategoryFilter

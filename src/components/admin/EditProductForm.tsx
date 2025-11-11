@@ -18,7 +18,7 @@ interface ProductFormData {
   description?: string;
   stockQuantity?: number;
   price?: string;
-  categoryId?: string;
+  categoryIds?: string[];
 }
 
 interface EditProductFormProps {
@@ -122,7 +122,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         description: product.description,
         stockQuantity: product.stockQuantity,
         price: product.price,
-        categoryId: product.category?.id, // Mudança aqui: salvar apenas o ID
+        categoryIds: product.categories?.map((cat) => cat.id) || [],
       });
 
       // Carregar imagens existentes
@@ -285,22 +285,34 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Categoria
+          Categorias
         </label>
         <select
-          name="categoryId"
-          value={formData.categoryId || ''}
-          onChange={handleInputChange}
+          name="categoryIds"
+          multiple
+          value={formData.categoryIds || []}
+          onChange={(e) => {
+            const selected = Array.from(e.target.selectedOptions).map(
+              (opt) => opt.value,
+            );
+            setFormData((prev) => ({
+              ...prev,
+              categoryIds: selected,
+            }));
+          }}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           required
         >
-          <option value="">Selecione uma categoria</option>
           {categories?.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
         </select>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplas
+          categorias
+        </span>
       </div>
 
       <div>

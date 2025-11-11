@@ -11,7 +11,7 @@ export interface IProduct {
   price: string;
   stockQuantity: number;
   imageUrls: string[];
-  category: IProductCategory;
+  categories: IProductCategory[];
 }
 
 export interface CartItem extends IProduct {

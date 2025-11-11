@@ -9,5 +9,5 @@ export interface ResponseCreateProduct {
   imageUrls: string[];
   createdAt: string;
   updatedAt: string;
-  category: ResponseCreateCategory;
+  categories: ResponseCreateCategory[];
 }

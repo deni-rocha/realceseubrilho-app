@@ -37,7 +37,11 @@ const CartItem: React.FC<CartItemProps> = ({
         <div className="mb-4 flex items-start justify-between">
           <div className="flex-1 min-w-0 pr-2">
             <h4 className="font-semibold text-sm line-clamp-2">{item.name}</h4>
-            <p className="text-sm text-[#338838] mt-1">{item.category.name}</p>
+            <p className="text-sm text-[#338838] mt-1">
+              {item.categories && item.categories.length > 0
+                ? item.categories.map((cat) => cat.name).join(', ')
+                : 'Sem categoria'}
+            </p>
             <p className="font-semibold mt-2">
               R$ {parseFloat(item.price).toFixed(2)}
             </p>

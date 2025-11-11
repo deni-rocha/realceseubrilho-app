@@ -22,7 +22,7 @@ const MobileSearchBar: React.FC<MobileSearchBarProps> = ({
   };
 
   return (
-    <div className="lg:hidden bg-white border-b border-gray-200 p-4">
+    <div className="lg:hidden bg-white border-b border-gray-200 p-4 mb-4">
       <div className="flex items-center gap-3">
         <div className="flex-1 relative">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
