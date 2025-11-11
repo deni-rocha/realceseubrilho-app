@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from 'react-icons/fa';
 import api from '../../api';
 
@@ -69,9 +69,9 @@ const VerifyEmail: React.FC = () => {
             <FaCheckCircle className="text-6xl mb-4" />
             <h1 className="text-2xl font-bold">Verificação Completa!</h1>
             <p className="mt-2 text-gray-600">{message}</p>
-            <a href="/login" className="mt-4 text-blue-500 hover:underline">
+            <Link to="/login" className="mt-4 text-blue-500 hover:underline">
               Ir para a página de login
-            </a>
+            </Link>
           </div>
         )}
 

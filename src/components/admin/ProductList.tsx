@@ -24,7 +24,7 @@ interface IProduct {
   imageUrls: string[];
   createdAt: string;
   updatedAt: string;
-  category: IProductCategory;
+  categories: IProductCategory[];
 }
 
 const ProductList: React.FC = () => {
@@ -56,7 +56,12 @@ const ProductList: React.FC = () => {
         case 'name':
           return product.name.toLowerCase().includes(searchValue);
         case 'category':
-          return product.category.name.toLowerCase().includes(searchValue);
+          return (
+            product.categories &&
+            product.categories.some((cat) =>
+              cat.name.toLowerCase().includes(searchValue),
+            )
+          );
         default:
           return true;
       }
@@ -252,7 +257,10 @@ const ProductList: React.FC = () => {
 
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 dark:text-gray-400">
-                        Categoria: {product.category.name}
+                        Categoria:{' '}
+                        {product.categories && product.categories.length > 0
+                          ? product.categories.map((cat) => cat.name).join(', ')
+                          : 'Sem categoria'}
                       </span>
                       <span className="text-gray-500 dark:text-gray-400">
                         Estoque: {product.stockQuantity}

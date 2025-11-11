@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   FaHome,
   FaUser,
@@ -26,41 +27,41 @@ const Sidebar: React.FC<SidebarProps> = ({
         <h1 className="text-2xl font-bold text-[#415444]">Realce Seu Brilho</h1>
       </div>
       <nav className="space-y-6">
-        <a
-          href="/catalog"
+        <Link
+          to="/home"
           className="flex items-center gap-3 rounded-lg bg-[#e0e5ce] px-3 py-2 text-[#415444] transition-colors"
         >
           <FaHome className="h-5 w-5" />
           Catálogo
-        </a>
+        </Link>
         {isAuthenticated && (
           <>
-            <a
-              href="/customer"
+            <Link
+              to="/customer"
               className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900"
             >
               <FaUser className="h-5 w-5" />
               Perfil
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900"
+            </Link>
+            <button
+              type="button"
+              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
             >
               <FaCog className="h-5 w-5" />
               Configurações
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900"
+            </button>
+            <button
+              type="button"
+              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
             >
               <FaEnvelope className="h-5 w-5" />
               Mensagens
-            </a>
+            </button>
           </>
         )}
-        <a
-          href="#cart"
-          className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900"
+        <button
+          type="button"
+          className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
         >
           <FaShoppingCart className="h-5 w-5" />
           Meu Carrinho
@@ -69,14 +70,15 @@ const Sidebar: React.FC<SidebarProps> = ({
               {cartItemsCount}
             </span>
           )}
-        </a>
-        <a
-          href="#"
+        </button>
+        <Link
+          to="/support"
           className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900"
         >
           <FaHeadset className="h-5 w-5" />
           Suporte
-        </a>
+        </Link>
+
         {isAuthenticated && (
           <button
             onClick={onLogout}

@@ -140,15 +140,27 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
   }, [product]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: name === 'stockQuantity' ? Number(value) : value,
     }));
+  };
+
+  const handleCategoryToggle = (categoryId: string) => {
+    setFormData((prev) => {
+      const currentCategories = prev.categoryIds || [];
+      const isSelected = currentCategories.includes(categoryId);
+
+      return {
+        ...prev,
+        categoryIds: isSelected
+          ? currentCategories.filter((id) => id !== categoryId)
+          : [...currentCategories, categoryId],
+      };
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,34 +296,35 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
           Categorias
         </label>
-        <select
-          name="categoryIds"
-          multiple
-          value={formData.categoryIds || []}
-          onChange={(e) => {
-            const selected = Array.from(e.target.selectedOptions).map(
-              (opt) => opt.value,
-            );
-            setFormData((prev) => ({
-              ...prev,
-              categoryIds: selected,
-            }));
-          }}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          required
-        >
-          {categories?.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplas
-          categorias
+        <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-3">
+          {categories && categories.length > 0 ? (
+            categories.map((category) => (
+              <label
+                key={category.id}
+                className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={formData.categoryIds?.includes(category.id) || false}
+                  onChange={() => handleCategoryToggle(category.id)}
+                  className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-200">
+                  {category.name}
+                </span>
+              </label>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Nenhuma categoria disponível
+            </p>
+          )}
+        </div>
+        <span className="text-xs text-gray-500 dark:text-gray-400 mt-2 block">
+          Selecione uma ou mais categorias para o produto
         </span>
       </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   FaCog,
   FaSignOutAlt,
@@ -49,42 +50,42 @@ const ProfileBar: React.FC<ProfileBarProps> = ({
       <div className="px-4 py-6">
         {isAuthenticated ? (
           <div className="space-y-1">
-            <a
-              href="/customer"
+            <Link
+              to="/customer"
               className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
               <div className="w-10 h-10 bg-[#e0e5ce] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaUser className="h-4 w-4 text-[#415444]" />
               </div>
               <span className="font-medium text-base">Meu Perfil</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
               <div className="w-10 h-10 bg-[#e0e5ce] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaEnvelope className="h-4 w-4 text-[#415444]" />
               </div>
               <span className="font-medium text-base">Mensagens</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
               <div className="w-10 h-10 bg-[#e0e5ce] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCog className="h-4 w-4 text-[#415444]" />
               </div>
               <span className="font-medium text-base">Configurações</span>
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/support"
               className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
               <div className="w-10 h-10 bg-[#e0e5ce] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaHeadset className="h-4 w-4 text-[#415444]" />
               </div>
               <span className="font-medium text-base">Suporte</span>
-            </a>
+            </Link>
 
             {/* Divider */}
             <div className="h-px bg-gray-200 my-4"></div>
@@ -103,20 +104,20 @@ const ProfileBar: React.FC<ProfileBarProps> = ({
         ) : (
           <div className="space-y-3">
             {/* Login Button */}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="flex items-center justify-center gap-2 px-6 py-4 bg-[#415444] text-white rounded-xl hover:bg-[#415444]/90 active:bg-[#415444]/80 transition-colors font-semibold text-base shadow-sm"
             >
               Entrar na Conta
-            </a>
+            </Link>
 
             {/* Register Button */}
-            <a
-              href="/register"
+            <Link
+              to="/register-user"
               className="flex items-center justify-center gap-2 px-6 py-4 border-2 border-[#415444] text-[#415444] rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors font-semibold text-base"
             >
               Criar Nova Conta
-            </a>
+            </Link>
 
             {/* Divider */}
             <div className="relative my-6">
@@ -129,13 +130,13 @@ const ProfileBar: React.FC<ProfileBarProps> = ({
             </div>
 
             {/* Support Link */}
-            <a
-              href="#"
+            <Link
+              to="/support"
               className="flex items-center justify-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
               <FaHeadset className="h-5 w-5 text-gray-500" />
               <span className="font-medium text-base">Falar com Suporte</span>
-            </a>
+            </Link>
           </div>
         )}
       </div>

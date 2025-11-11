@@ -10,6 +10,8 @@ import RegisterUser from './pages/register';
 import VerifyEmail from './pages/verifyEmail';
 import RequestEmailVerification from './pages/requestEmailVerification';
 import Home from './pages/home';
+import SupportWidget from './components/SupportWidget.tsx';
+import CustomerProfile from './pages/customer';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -41,9 +43,11 @@ function App() {
             }
           />
           <Route path="/home" element={<Home />} />
+          <Route path="/customer" element={<CustomerProfile />} />
           <Route path="*" element={<NotFound />} />
           <Route path="register-user" element={<RegisterUser />} />
           <Route path="verify-email" element={<VerifyEmail />} />
+          <Route path="support" element={<SupportWidget />} />
           <Route
             path="request-email-verification"
             element={<RequestEmailVerification />}

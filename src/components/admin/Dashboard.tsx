@@ -4,6 +4,11 @@ import { FaUsers, FaBox, FaShoppingCart, FaSpinner } from 'react-icons/fa';
 import { useMemo } from 'react';
 
 // Tipos
+interface Category {
+  id: string;
+  name: string;
+}
+
 interface User {
   id: string;
   name: string;
@@ -21,10 +26,7 @@ interface Product {
   description: string;
   stockQuantity: number;
   price: number;
-  category: {
-    id: string;
-    name: string;
-  };
+  categories: Category[];
 }
 
 interface Order {
@@ -288,14 +290,15 @@ const Dashboard = () => {
     }));
   }, [users]);
 
-  // Dados para gráfico de produtos por categoria
+  // Dados para gráfico de produtos por categoria (corrigido para múltiplas categorias)
   const productsByCategory = useMemo(() => {
     if (!products) return [];
 
     const categoryCount: Record<string, number> = {};
     products.forEach((product) => {
-      const categoryName = product.category.name;
-      categoryCount[categoryName] = (categoryCount[categoryName] || 0) + 1;
+      product.categories?.forEach((cat) => {
+        categoryCount[cat.name] = (categoryCount[cat.name] || 0) + 1;
+      });
     });
 
     const colors = [
@@ -467,7 +470,9 @@ const Dashboard = () => {
                         {product.name}
                       </td>
                       <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
-                        {product.category.name}
+                        {product.categories && product.categories.length > 0
+                          ? product.categories.map((cat) => cat.name).join(', ')
+                          : 'Sem categoria'}
                       </td>
                       <td className="px-6 py-4">
                         <span

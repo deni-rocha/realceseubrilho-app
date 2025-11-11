@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FaArrowRight,
   FaEnvelope,
+  FaEye,
+  FaEyeSlash,
   FaLock,
   FaSpinner,
   FaUser,
-  FaUserShield,
 } from 'react-icons/fa';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -37,6 +38,9 @@ const formSchema = z
 type FormData = z.infer<typeof formSchema>;
 
 const FormUser: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // 2. Gerenciamento do Formulário com useForm e zodResolver
   const {
     register,
@@ -126,15 +130,22 @@ const FormUser: React.FC = () => {
                 <FaLock />
               </span>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Senha"
-                className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
+                className={`w-full pl-12 pr-12 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.password
                     ? 'border-red-500 focus:ring-red-300'
                     : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('password')}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1 absolute -bottom-5">
                   {errors.password.message}
@@ -148,34 +159,27 @@ const FormUser: React.FC = () => {
                 <FaLock />
               </span>
               <input
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirmar Senha"
-                className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
+                className={`w-full pl-12 pr-12 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white ${
                   errors.confirmPassword
                     ? 'border-red-500 focus:ring-red-300'
                     : 'border-gray-400 focus:ring-green-400 dark:border-black'
                 }`}
                 {...register('confirmPassword')}
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-xs mt-1 absolute -bottom-5">
                   {errors.confirmPassword.message}
                 </p>
               )}
-            </div>
-
-            {/* Campo Nível de Acesso (Role) */}
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white">
-                <FaUserShield />
-              </span>
-              <select
-                className="w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none dark:text-white dark:bg-accent-dark"
-                {...register('role')}
-              >
-                <option value={'CUSTOMER'}>Cliente</option>
-                <option value={'ADMIN'}>Administrador</option>
-              </select>
             </div>
           </div>
 

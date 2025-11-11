@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react';
-import { FaUser, FaLock, FaArrowRight, FaSpinner } from 'react-icons/fa';
+import {
+  FaUser,
+  FaLock,
+  FaArrowRight,
+  FaSpinner,
+  FaEye,
+  FaEyeSlash,
+  FaUserSecret,
+} from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
 
 const Login = () => {
   const [data, setData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const { login, status, error, user } = useAuthStore();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -15,6 +24,14 @@ const Login = () => {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     login({ email: data.email, password: data.password });
+  }
+
+  function handleGuestLogin() {
+    // Redireciona para a página home como convidado (sem autenticação)
+    toast.info('Entrando como convidado...');
+    // Você pode implementar uma lógica específica aqui
+    // Por exemplo, criar um usuário guest temporário ou redirecionar direto
+    window.location.href = '/home';
   }
 
   useEffect(() => {
@@ -67,13 +84,20 @@ const Login = () => {
                 <FaLock />
               </span>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Senha"
-                className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-full focus:ring-2 focus:ring-green-400 focus:outline-none dark:text-white dark:border-black dark:focus:ring-yellow-300"
+                className="w-full pl-12 pr-12 py-3 border border-gray-400 rounded-full focus:ring-2 focus:ring-green-400 focus:outline-none dark:text-white dark:border-black dark:focus:ring-yellow-300"
                 name="password"
                 value={data.password}
                 onChange={handleChange}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             <a
               href="#"
@@ -83,7 +107,7 @@ const Login = () => {
             </a>
           </div>
 
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-center mb-8">
             <button
               type="submit"
               onClick={handleSubmit}
@@ -105,7 +129,7 @@ const Login = () => {
           </div>
         </form>
 
-        <div className="text-center">
+        <div className="text-center mb-6">
           <span className="text-gray-600 dark:text-gray-200">
             Ainda não tem uma conta?
           </span>
@@ -115,6 +139,18 @@ const Login = () => {
           >
             Criar
           </Link>
+        </div>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            disabled={status === 'loading'}
+            className="flex items-center justify-center mx-auto px-6 py-2 text-sm text-gray-700 dark:text-gray-200 font-medium border-2 border-gray-400 dark:border-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FaUserSecret className="mr-2" />
+            Entrar como Convidado
+          </button>
         </div>
       </div>
     </div>
