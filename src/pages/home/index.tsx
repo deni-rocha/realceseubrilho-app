@@ -46,6 +46,9 @@ const Home: React.FC = () => {
     type: ToastType;
   } | null>(null);
 
+  // State for filter visibility
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   // Auth
   const { isAuthenticated } = useAuth();
   const { logout } = useAuthStore();
@@ -394,6 +397,8 @@ const Home: React.FC = () => {
                     onClearFilters={handleClearFilters}
                     productCount={filteredProducts.length}
                     maxPrice={maxPrice}
+                    isOpen={isFilterOpen}
+                    onOpenChange={setIsFilterOpen}
                   />
                 </div>
               </div>
@@ -488,12 +493,13 @@ const Home: React.FC = () => {
         isCheckoutDisabled={cartItems.length === 0}
       />
 
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation - Hide when filter is open */}
       <BottomNavigationBar
         activeTab={mobileActiveTab}
         cartItemsCount={cartItems.length}
         onTabChange={handleMobileTabChange}
         onClearSearch={() => setSearchTerm('')}
+        isHidden={isFilterOpen}
       />
 
       {/* Guest Checkout Modal */}

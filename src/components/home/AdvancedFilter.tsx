@@ -25,6 +25,8 @@ interface AdvancedFilterProps {
   onClearFilters: () => void;
   productCount: number;
   maxPrice?: number;
+  isOpen?: boolean; // Add isOpen prop to expose state
+  onOpenChange?: (isOpen: boolean) => void; // Add callback for state changes
 }
 
 const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
@@ -40,8 +42,17 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
   onClearFilters,
   productCount,
   maxPrice = 1000,
+  isOpen, // Accept isOpen prop
+  onOpenChange, // Accept onOpenChange callback
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  // Use controlled or uncontrolled state based on props
+  const isControlled = isOpen !== undefined;
+  const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
+  
+  // Determine which state to use
+  const effectiveIsOpen = isControlled ? isOpen : uncontrolledIsOpen;
+  const setIsOpen = isControlled ? onOpenChange : setUncontrolledIsOpen;
+  
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
@@ -80,7 +91,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
 
   // Lock body scroll when mobile filter is open
   useEffect(() => {
-    if (isOpen) {
+    if (effectiveIsOpen) {
       document.body.classList.add('filter-open');
       document.body.style.overflow = 'hidden';
     } else {
@@ -92,14 +103,24 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
       document.body.classList.remove('filter-open');
       document.body.style.overflow = '';
     };
-  }, [isOpen]);
+  }, [effectiveIsOpen]);
+
+  // Handle internal state changes
+  const handleSetIsOpen = (newIsOpen: boolean) => {
+    if (!isControlled) {
+      setUncontrolledIsOpen(newIsOpen);
+    }
+    if (onOpenChange) {
+      onOpenChange(newIsOpen);
+    }
+  };
 
   return (
     <>
       {/* Mobile Filter Button */}
       <div className="lg:hidden mb-4">
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => handleSetIsOpen(!effectiveIsOpen)}
           className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-2">
@@ -116,10 +137,10 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
       </div>
 
       {/* Mobile Overlay */}
-      {isOpen && (
+      {effectiveIsOpen && (
         <div
           className="filter-overlay lg:hidden"
-          onClick={() => setIsOpen(false)}
+          onClick={() => handleSetIsOpen(false)}
           aria-hidden="true"
         />
       )}
@@ -128,7 +149,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
       <div
         className={`
         filter-panel-mobile lg:relative
-        ${isOpen ? 'open' : 'closed'}
+        ${effectiveIsOpen ? 'open' : 'closed'}
       `}
         role="dialog"
         aria-modal="true"
@@ -148,7 +169,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
             )}
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => handleSetIsOpen(false)}
             className="text-gray-500 hover:text-gray-700 filter-button"
             aria-label="Fechar filtros"
           >
@@ -374,7 +395,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
         {/* Mobile Footer */}
         <div className="filter-mobile-footer lg:hidden">
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => handleSetIsOpen(false)}
             className="w-full px-4 py-3 bg-[#415444] text-white font-semibold rounded-lg hover:bg-[#338838] transition-colors filter-button"
             aria-label={`Ver ${productCount} produtos`}
           >

@@ -6,6 +6,7 @@ interface BottomNavigationBarProps {
   cartItemsCount: number;
   onTabChange: (tab: 'home' | 'search' | 'cart' | 'profile') => void;
   onClearSearch?: () => void; // New prop to clear search
+  isHidden?: boolean; // New prop to control visibility
 }
 
 const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
@@ -13,6 +14,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   cartItemsCount,
   onTabChange,
   onClearSearch,
+  isHidden = false, // Default to false (visible)
 }) => {
   // Handle home tab click with search clearing
   const handleHomeClick = () => {
@@ -23,7 +25,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   };
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40">
+    <div className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out ${isHidden ? 'translate-y-full' : 'translate-y-0'}`}>
       <div className="flex items-center justify-around h-16">
         {/* Home */}
         <button
