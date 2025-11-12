@@ -5,6 +5,7 @@ export interface ResponseCreateProduct {
   name: string;
   description: string;
   price: string;
+  cost?: number;
   stockQuantity: number;
   imageUrls: string[];
   createdAt: string;

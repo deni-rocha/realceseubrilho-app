@@ -39,6 +39,11 @@ const productSchema = z.object({
     .number()
     .min(0, 'O preço não pode ser negativo')
     .multipleOf(0.01, 'O preço deve ter no máximo 2 casas decimais'),
+  cost: z
+    .number()
+    .min(0, 'O custo não pode ser negativo')
+    .multipleOf(0.01, 'O custo deve ter no máximo 2 casas decimais')
+    .optional(),
   categoryId: z.string().min(1, 'Selecione uma categoria'),
   image: z.any().optional(),
 });
@@ -151,6 +156,7 @@ const FormProduct: React.FC = () => {
           description: data.description,
           stockQuantity: data.stockQuantity,
           price: data.price,
+          cost: data.cost,
           categoryId: data.categoryId,
         },
       );
@@ -345,7 +351,7 @@ const FormProduct: React.FC = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Quantidade em Estoque */}
           <div>
             <label
@@ -374,7 +380,7 @@ const FormProduct: React.FC = () => {
               htmlFor="price"
               className="block text-sm font-medium text-gray-700 dark:text-gray-200"
             >
-              Preço
+              Preço de Venda
             </label>
             <input
               type="number"
@@ -389,6 +395,31 @@ const FormProduct: React.FC = () => {
                 {errors.price.message}
               </p>
             )}
+          </div>
+
+          {/* Custo */}
+          <div>
+            <label
+              htmlFor="cost"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Custo (Opcional)
+            </label>
+            <input
+              type="number"
+              id="cost"
+              step="0.01"
+              {...register('cost', { valueAsNumber: true })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              min="0"
+              placeholder="0.00"
+            />
+            {errors.cost && (
+              <p className="mt-1 text-sm text-red-600">{errors.cost.message}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Custo de aquisição para cálculo de lucro
+            </p>
           </div>
         </div>
 
