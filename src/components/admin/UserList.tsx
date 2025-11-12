@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import fetchUsers from '../../api/fetchUsers';
-import UserCard from '../UserCard';
+import UserCard from './UserCard';
 import UserCardDetails from './UserCardDetails';
 import { IoChevronBack } from 'react-icons/io5';
 import { FaSearch } from 'react-icons/fa';

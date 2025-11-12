@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FaSearch, FaShoppingCart } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
-import publicApi from '../api/publicApi';
+import publicApi from '../../api/publicApi';
 
 interface IProductCategory {
   id: string;

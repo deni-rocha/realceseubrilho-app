@@ -13,10 +13,10 @@ import {
   FaArrowLeft,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/catalog/Sidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
+import Sidebar from '../../components/home/Sidebar';
 
 const CustomerProfile: React.FC = () => {
   const { user, logout } = useAuthStore();

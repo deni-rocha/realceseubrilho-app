@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './catalog/Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { useAuthStore } from '../store/authStore';
+import Sidebar from './home/Sidebar';
 
 type FAQ = {
   id: string;

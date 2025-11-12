@@ -1,6 +1,6 @@
 import { FaEdit } from 'react-icons/fa';
-import type { UserDetails } from '../types/UserDetails';
-import translateRole from '../utils/translateRole';
+import type { UserDetails } from '../../types/UserDetails';
+import translateRole from '../../utils/translateRole';
 import { type Dispatch } from 'react';
 
 interface UserCardProps {
