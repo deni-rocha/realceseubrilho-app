@@ -1,0 +1,247 @@
+/* AdvancedFilter Custom Styles */
+
+/* Prevent body scroll when mobile filter is open */
+body.filter-open {
+  overflow: hidden;
+}
+
+/* Mobile overlay improvements */
+.filter-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile filter panel */
+.filter-panel-mobile {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background-color: white;
+  z-index: 50;
+  overflow-y: auto;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-panel-mobile.closed {
+  transform: translateX(100%);
+}
+
+.filter-panel-mobile.open {
+  transform: translateX(0);
+}
+
+/* Desktop filter sidebar */
+.filter-panel-desktop {
+  width: 100%;
+  max-width: 256px;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+}
+
+/* Prevent horizontal overflow */
+.filter-content {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Range slider improvements */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #415444;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  background: #338838;
+  transform: scale(1.1);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #415444;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease-in-out;
+}
+
+input[type='range']::-moz-range-thumb:hover {
+  background: #338838;
+  transform: scale(1.1);
+}
+
+/* Checkbox and radio custom styles */
+input[type='checkbox']:checked,
+input[type='radio']:checked {
+  background-color: #415444;
+  border-color: #415444;
+}
+
+input[type='checkbox']:focus,
+input[type='radio']:focus {
+  ring-color: #415444;
+  ring-offset-color: #fff;
+}
+
+/* Scrollbar styles for mobile panel */
+.filter-panel-mobile::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-panel-mobile::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.filter-panel-mobile::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.filter-panel-mobile::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth transitions for sections */
+.filter-section {
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Badge animations */
+.filter-badge {
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1023px) {
+  .filter-panel-desktop {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filter-overlay {
+    display: none;
+  }
+
+  .filter-panel-mobile {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: none;
+    transform: none !important;
+  }
+}
+
+/* Prevent text selection on rapid clicks */
+.filter-button {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Loading state */
+.filter-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Empty state */
+.filter-empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Mobile footer sticky positioning */
+.filter-mobile-footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem;
+  z-index: 30;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Accessibility improvements */
+.filter-label:focus-within {
+  outline: 2px solid #415444;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  input[type='range']::-webkit-slider-thumb {
+    border: 2px solid currentColor;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .filter-panel-mobile,
+  .filter-overlay,
+  .filter-section,
+  .filter-badge {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .filter-overlay,
+  .filter-panel-mobile,
+  .filter-mobile-footer {
+    display: none;
+  }
+}

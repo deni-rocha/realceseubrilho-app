@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import publicApi from '../../api/publicApi';
 import { useAuth } from '../../hooks/useAuth';
@@ -14,7 +14,10 @@ import type {
 import Sidebar from '../../components/home/Sidebar';
 import Header from '../../components/home/Header';
 import BannerCards from '../../components/home/BannerCards';
-import CategoryFilter from '../../components/home/CategoryFilter';
+import AdvancedFilter, {
+  type FilterOptions,
+} from '../../components/home/AdvancedFilter';
+import ActiveFilterBadges from '../../components/home/ActiveFilterBadges';
 import ProductCard from '../../components/home/ProductCard';
 import CartContent from '../../components/home/CartContent';
 import CartDrawer from '../../components/home/CartDrawer';
@@ -27,7 +30,10 @@ import Toast, { type ToastType } from '../../components/home/Toast';
 const Home: React.FC = () => {
   // State
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [sortBy, setSortBy] = useState<FilterOptions['sortBy']>('newest');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -85,6 +91,21 @@ const Home: React.FC = () => {
     },
   });
 
+  // Calculate max price from products
+  const maxPrice = useMemo(() => {
+    if (!products || products.length === 0) return 1000;
+    return Math.ceil(
+      Math.max(...products.map((p: IProduct) => parseFloat(p.price))),
+    );
+  }, [products]);
+
+  // Initialize price range when products load
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setPriceRange({ min: 0, max: maxPrice });
+    }
+  }, [products, maxPrice]);
+
   // Extract categories from products
   const categories = useMemo(() => {
     if (!products) return [];
@@ -95,21 +116,61 @@ const Home: React.FC = () => {
     return Array.from(uniqueCategories);
   }, [products]);
 
-  // Filter products
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
-    return products.filter((product: IProduct) => {
+    let filtered = products.filter((product: IProduct) => {
+      // Search filter
       const matchesSearch = product.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+
+      // Category filter - if no categories selected, show all
       const matchesCategory =
-        selectedCategory === 'all' ||
+        selectedCategories.length === 0 ||
         (product.categories &&
-          product.categories.some((cat: any) => cat.name === selectedCategory));
-      return matchesSearch && matchesCategory && product.stockQuantity > 0;
+          product.categories.some((cat: any) =>
+            selectedCategories.includes(cat.name),
+          ));
+
+      // Price filter
+      const productPrice = parseFloat(product.price);
+      const matchesPrice =
+        productPrice >= priceRange.min && productPrice <= priceRange.max;
+
+      // Stock filter
+      const matchesStock = !inStockOnly || product.stockQuantity > 0;
+
+      return matchesSearch && matchesCategory && matchesPrice && matchesStock;
     });
-  }, [products, searchTerm, selectedCategory]);
+
+    // Sort products
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-asc':
+          return parseFloat(a.price) - parseFloat(b.price);
+        case 'price-desc':
+          return parseFloat(b.price) - parseFloat(a.price);
+        case 'newest':
+        default:
+          return 0; // Keep original order
+      }
+    });
+
+    return sorted;
+  }, [
+    products,
+    searchTerm,
+    selectedCategories,
+    priceRange,
+    sortBy,
+    inStockOnly,
+  ]);
 
   // Cart handlers
   const updateQuantity = useCallback((itemId: string, change: number) => {
@@ -211,6 +272,31 @@ const Home: React.FC = () => {
     [createOrderMutation],
   );
 
+  // Clear all filters
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategories([]);
+    setPriceRange({ min: 0, max: maxPrice });
+    setSortBy('newest');
+    setInStockOnly(false);
+  }, [maxPrice]);
+
+  // Remove individual filters
+  const handleRemoveCategory = useCallback((category: string) => {
+    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  }, []);
+
+  const handleRemovePriceFilter = useCallback(() => {
+    setPriceRange({ min: 0, max: maxPrice });
+  }, [maxPrice]);
+
+  const handleRemoveSortFilter = useCallback(() => {
+    setSortBy('newest');
+  }, []);
+
+  const handleRemoveStockFilter = useCallback(() => {
+    setInStockOnly(false);
+  }, []);
+
   // Mobile tab handler
   const handleMobileTabChange = useCallback(
     (tab: 'home' | 'search' | 'cart' | 'profile') => {
@@ -290,40 +376,84 @@ const Home: React.FC = () => {
             {/* Banner Cards - Hide when searching (mobile) */}
             {!searchTerm && mobileActiveTab !== 'search' && <BannerCards />}
 
-            {/* Category Filter */}
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
-
-            {/* Section Header */}
-            <div className="mb-8 flex items-center justify-between">
-              <h3 className="text-2xl font-semibold">Coleção Popular</h3>
-              <button className="text-[#338838] hover:underline">
-                Ver Tudo
-              </button>
-            </div>
-
-            {/* Products Grid */}
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                Nenhum produto encontrado.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
-                {filteredProducts.map((product: IProduct) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isHovered={hoveredProduct === product.id}
-                    onMouseEnter={() => setHoveredProduct(product.id)}
-                    onMouseLeave={() => setHoveredProduct(null)}
-                    onAddToCart={() => addToCart(product)}
+            {/* Advanced Filter and Products Layout */}
+            <div className="flex flex-col lg:flex-row gap-6 mt-8">
+              {/* Filter Sidebar */}
+              <div className="w-full lg:w-64 lg:flex-shrink-0">
+                <div className="lg:sticky lg:top-4">
+                  <AdvancedFilter
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    onCategoriesChange={setSelectedCategories}
+                    priceRange={priceRange}
+                    onPriceRangeChange={setPriceRange}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                    inStockOnly={inStockOnly}
+                    onInStockChange={setInStockOnly}
+                    onClearFilters={handleClearFilters}
+                    productCount={filteredProducts.length}
+                    maxPrice={maxPrice}
                   />
-                ))}
+                </div>
               </div>
-            )}
+
+              {/* Products Section */}
+              <div className="flex-1 min-w-0">
+                {/* Active Filter Badges */}
+                <ActiveFilterBadges
+                  selectedCategories={selectedCategories}
+                  priceRange={priceRange}
+                  sortBy={sortBy}
+                  inStockOnly={inStockOnly}
+                  maxPrice={maxPrice}
+                  onRemoveCategory={handleRemoveCategory}
+                  onRemovePriceFilter={handleRemovePriceFilter}
+                  onRemoveSortFilter={handleRemoveSortFilter}
+                  onRemoveStockFilter={handleRemoveStockFilter}
+                  onClearAll={handleClearFilters}
+                />
+
+                {/* Section Header */}
+                <div className="mb-6 flex items-center justify-between">
+                  <h3 className="text-2xl font-semibold">
+                    {selectedCategories.length > 0
+                      ? selectedCategories.join(', ')
+                      : 'Todos os Produtos'}
+                  </h3>
+                  <span className="text-sm text-gray-600">
+                    {filteredProducts.length}{' '}
+                    {filteredProducts.length === 1 ? 'produto' : 'produtos'}
+                  </span>
+                </div>
+
+                {/* Products Grid */}
+                {filteredProducts.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <p className="text-lg mb-2">Nenhum produto encontrado.</p>
+                    <button
+                      onClick={handleClearFilters}
+                      className="text-[#338838] hover:underline text-sm font-medium"
+                    >
+                      Limpar filtros
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+                    {filteredProducts.map((product: IProduct) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        isHovered={hoveredProduct === product.id}
+                        onMouseEnter={() => setHoveredProduct(product.id)}
+                        onMouseLeave={() => setHoveredProduct(null)}
+                        onAddToCart={() => addToCart(product)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </>
         )}
       </main>
