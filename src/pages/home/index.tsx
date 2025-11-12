@@ -493,6 +493,7 @@ const Home: React.FC = () => {
         activeTab={mobileActiveTab}
         cartItemsCount={cartItems.length}
         onTabChange={handleMobileTabChange}
+        onClearSearch={() => setSearchTerm('')}
       />
 
       {/* Guest Checkout Modal */}

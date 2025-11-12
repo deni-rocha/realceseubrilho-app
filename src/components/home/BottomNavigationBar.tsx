@@ -5,19 +5,29 @@ interface BottomNavigationBarProps {
   activeTab: 'home' | 'search' | 'cart' | 'profile';
   cartItemsCount: number;
   onTabChange: (tab: 'home' | 'search' | 'cart' | 'profile') => void;
+  onClearSearch?: () => void; // New prop to clear search
 }
 
 const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   activeTab,
   cartItemsCount,
   onTabChange,
+  onClearSearch,
 }) => {
+  // Handle home tab click with search clearing
+  const handleHomeClick = () => {
+    onTabChange('home');
+    if (onClearSearch) {
+      onClearSearch();
+    }
+  };
+
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40">
       <div className="flex items-center justify-around h-16">
         {/* Home */}
         <button
-          onClick={() => onTabChange('home')}
+          onClick={handleHomeClick}
           className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'home'
               ? 'text-[#415444]'
