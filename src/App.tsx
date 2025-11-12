@@ -12,6 +12,8 @@ import RequestEmailVerification from './pages/requestEmailVerification';
 import Home from './pages/home';
 import SupportWidget from './components/SupportWidget.tsx';
 import CustomerProfile from './pages/customer';
+import FinancialCharts from './components/admin/charts/FinancialCharts';
+import DashboardWithCharts from './components/admin/DashboardWithCharts';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -41,6 +43,12 @@ function App() {
                 <AdminPainel />
               </PrivateRoute>
             }
+          />
+
+          <Route path="/admin/charts" element={<FinancialCharts />} />
+          <Route
+            path="/admin/dashboard-charts"
+            element={<DashboardWithCharts />}
           />
           <Route path="/home" element={<Home />} />
           <Route path="/customer" element={<CustomerProfile />} />

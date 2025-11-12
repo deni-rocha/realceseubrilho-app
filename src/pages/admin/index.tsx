@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import UserList from '../../components/admin/UserList';
-import Dashboard from '../../components/admin/Dashboard';
 import FormUser from '../../components/FormUser';
 import { IoMdLogOut } from 'react-icons/io';
 import AdmSettings from '../../components/admin/AdmSettings';
@@ -10,6 +9,11 @@ import FormProduct from '../../components/admin/FormProduct';
 import ProductList from '../../components/admin/ProductList';
 import CategoryList from '../../components/admin/CategoryList';
 import FormCategory from '../../components/admin/FormCategory';
+import { OrderList, OrderDetails } from '../../components/admin/orders';
+import DashboardWithCharts from '../../components/admin/DashboardWithCharts';
+import ExpensesPage from '../../components/admin/expenses/ExpensesPage';
+import FinancialReports from '../../components/admin/FinancialReports';
+import FinancialCharts from '../../components/admin/charts/FinancialCharts';
 
 type ActiveMenuItem =
   | 'dashboard'
@@ -22,6 +26,13 @@ type ActiveMenuItem =
   | 'categories'
   | 'category-list'
   | 'category-add'
+  | 'orders'
+  | 'order-list'
+  | 'order-details'
+  | 'financial'
+  | 'expenses'
+  | 'reports'
+  | 'charts'
   | 'settings'
   | 'logout'
   | null;
@@ -32,6 +43,8 @@ const AdminPainel: React.FC = () => {
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [isCategoriesDropdownOpen, setIsCategoriesDropdownOpen] =
     useState(false);
+  const [isOrdersDropdownOpen, setIsOrdersDropdownOpen] = useState(false);
+  const [isFinancialDropdownOpen, setIsFinancialDropdownOpen] = useState(false);
   const [activeMenuItem, setActiveMenuItem] =
     useState<ActiveMenuItem>('dashboard');
   const [showDashboard, setShowDashboard] = useState(true);
@@ -43,6 +56,12 @@ const AdminPainel: React.FC = () => {
   const [showProductAdd, setShowProductAdd] = useState(false);
   const [showCategoryList, setShowCategoryList] = useState(false);
   const [showCategoryAdd, setShowCategoryAdd] = useState(false);
+  const [showOrderList, setShowOrderList] = useState(false);
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [showExpenses, setShowExpenses] = useState(false);
+  const [showReports, setShowReports] = useState(false);
+  const [showCharts, setShowCharts] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const { logout } = useAuthStore();
@@ -65,6 +84,16 @@ const AdminPainel: React.FC = () => {
     setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
   };
 
+  const toggleOrdersDropdown = () => {
+    setIsOrdersDropdownOpen(!isOrdersDropdownOpen);
+    setActiveMenuItem('orders');
+  };
+
+  const toggleFinancialDropdown = () => {
+    setIsFinancialDropdownOpen(!isFinancialDropdownOpen);
+    setActiveMenuItem('financial');
+  };
+
   const resetAllViews = () => {
     setShowDashboard(false);
     setShowUserList(false);
@@ -75,6 +104,11 @@ const AdminPainel: React.FC = () => {
     setShowProductAdd(false);
     setShowCategoryList(false);
     setShowCategoryAdd(false);
+    setShowOrderList(false);
+    setShowOrderDetails(false);
+    setShowExpenses(false);
+    setShowReports(false);
+    setShowCharts(false);
   };
 
   // Detecta o scroll para adicionar sombra
@@ -139,6 +173,21 @@ const AdminPainel: React.FC = () => {
       case 'category-add':
         setShowCategoryAdd(true);
         break;
+      case 'order-list':
+        setShowOrderList(true);
+        break;
+      case 'order-details':
+        setShowOrderDetails(true);
+        break;
+      case 'expenses':
+        setShowExpenses(true);
+        break;
+      case 'reports':
+        setShowReports(true);
+        break;
+      case 'charts':
+        setShowCharts(true);
+        break;
       case 'settings':
         setShowSettings(true);
         break;
@@ -146,6 +195,20 @@ const AdminPainel: React.FC = () => {
         setShowLogout(true);
         break;
     }
+  };
+
+  const handleViewOrderDetails = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    resetAllViews();
+    setShowOrderDetails(true);
+    setActiveMenuItem('order-details');
+  };
+
+  const handleBackToOrderList = () => {
+    resetAllViews();
+    setShowOrderList(true);
+    setActiveMenuItem('order-list');
+    setSelectedOrderId(null);
   };
 
   const getTitleByActiveMenuItem = (activeItem: ActiveMenuItem): string => {
@@ -170,6 +233,20 @@ const AdminPainel: React.FC = () => {
         return 'Lista de Categorias';
       case 'category-add':
         return 'Adicionar Categoria';
+      case 'orders':
+        return 'Pedidos';
+      case 'order-list':
+        return 'Lista de Pedidos';
+      case 'order-details':
+        return 'Detalhes do Pedido';
+      case 'financial':
+        return 'Financeiro';
+      case 'expenses':
+        return 'Despesas';
+      case 'reports':
+        return 'Relatórios Financeiros';
+      case 'charts':
+        return 'Gráficos';
       case 'settings':
         return 'Configurações';
       default:
@@ -348,6 +425,84 @@ const AdminPainel: React.FC = () => {
               )}
             </li>
 
+            {/* Seção de Pedidos */}
+            <li className="relative">
+              <button
+                onClick={toggleOrdersDropdown}
+                className={getDropdownButtonClasses('orders')}
+              >
+                <span>Pedidos</span>
+                <span
+                  className={`transform transition-transform duration-200 ${
+                    isOrdersDropdownOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                >
+                  ▼
+                </span>
+              </button>
+              {isOrdersDropdownOpen && (
+                <ul className="pl-4 mt-2 space-y-1">
+                  <li>
+                    <a
+                      id="order-list"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('order-list')}
+                    >
+                      Lista de Pedidos
+                    </a>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            {/* Seção Financeira */}
+            <li className="relative">
+              <button
+                onClick={toggleFinancialDropdown}
+                className={getDropdownButtonClasses('financial')}
+              >
+                <span>Financeiro</span>
+                <span
+                  className={`transform transition-transform duration-200 ${
+                    isFinancialDropdownOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                >
+                  ▼
+                </span>
+              </button>
+              {isFinancialDropdownOpen && (
+                <ul className="pl-4 mt-2 space-y-1">
+                  <li>
+                    <a
+                      id="expenses"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('expenses')}
+                    >
+                      Despesas
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      id="reports"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('reports')}
+                    >
+                      Relatórios
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      id="charts"
+                      onClick={toggleOptionsMenu}
+                      className={getMenuItemClasses('charts')}
+                    >
+                      Gráficos
+                    </a>
+                  </li>
+                </ul>
+              )}
+            </li>
+
             <li>
               <a
                 id="settings"
@@ -371,13 +526,23 @@ const AdminPainel: React.FC = () => {
 
       {/* --- Conteúdo Principal --- */}
       <main className="mt-8 flex-1 pt-4 sm:p-8 md:ml-0 overflow-y-auto bg-gray-100 dark:bg-primary-dark">
-        {showDashboard && <Dashboard />}
+        {showDashboard && <DashboardWithCharts />}
         {showUserList && <UserList />}
         {showUserAdd && <FormUser />}
         {showProductList && <ProductList />}
         {showProductAdd && <FormProduct />}
         {showCategoryList && <CategoryList />}
         {showCategoryAdd && <FormCategory />}
+        {showOrderList && <OrderList onViewDetails={handleViewOrderDetails} />}
+        {showOrderDetails && selectedOrderId && (
+          <OrderDetails
+            orderId={selectedOrderId}
+            onBack={handleBackToOrderList}
+          />
+        )}
+        {showExpenses && <ExpensesPage />}
+        {showReports && <FinancialReports />}
+        {showCharts && <FinancialCharts />}
         {showSettings && <AdmSettings />}
         {showLogout && <div className="dark:text-white">Saindo...</div>}
       </main>
