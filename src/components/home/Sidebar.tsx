@@ -14,12 +14,16 @@ interface SidebarProps {
   isAuthenticated: boolean;
   cartItemsCount: number;
   onLogout: () => void;
+  onToggleCart?: () => void;
+  isCartVisible?: boolean; // Add the new prop
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   isAuthenticated,
   cartItemsCount,
   onLogout,
+  onToggleCart,
+  isCartVisible = true, // Default to true (cart visible)
 }) => {
   const location = useLocation();
 
@@ -66,14 +70,14 @@ const Sidebar: React.FC<SidebarProps> = ({
             </Link>
             <button
               type="button"
-              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
+              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left cursor-pointer"
             >
               <FaCog className="h-5 w-5" />
               Configurações
             </button>
             <button
               type="button"
-              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
+              className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left cursor-pointer"
             >
               <FaEnvelope className="h-5 w-5" />
               Mensagens
@@ -82,7 +86,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         )}
         <button
           type="button"
-          className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left"
+          onClick={onToggleCart}
+          className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left cursor-pointer"
         >
           <FaShoppingCart className="h-5 w-5" />
           Meu Carrinho
@@ -91,6 +96,22 @@ const Sidebar: React.FC<SidebarProps> = ({
               {cartItemsCount}
             </span>
           )}
+          {/* Visual marker to indicate the button is toggleable */}
+          <svg 
+            className={`ml-auto h-4 w-4 text-gray-400 transform transition-transform ${
+              isCartVisible ? 'rotate-180' : ''
+            }`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M19 9l-7 7-7-7" 
+            />
+          </svg>
         </button>
         <Link
           to="/support"

@@ -37,6 +37,7 @@ const Home: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCartVisible, setIsCartVisible] = useState(true); // New state for desktop cart visibility
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [mobileActiveTab, setMobileActiveTab] = useState<
     'home' | 'search' | 'cart' | 'profile'
@@ -338,6 +339,8 @@ const Home: React.FC = () => {
         isAuthenticated={isAuthenticated}
         cartItemsCount={cartItems.length}
         onLogout={logout}
+        onToggleCart={() => setIsCartVisible(!isCartVisible)}
+        isCartVisible={isCartVisible} // Pass the cart visibility state
       />
 
       {/* Main Content */}
@@ -464,19 +467,21 @@ const Home: React.FC = () => {
       </main>
 
       {/* Desktop Cart Sidebar */}
-      <aside className="w-80 lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
-        <div className="mb-8 flex items-center justify-between">
-          <h3 className="text-2xl font-semibold">Meu Carrinho</h3>
-        </div>
-        <CartContent
-          cartItems={cartItems}
-          cartTotal={cartTotal}
-          onUpdateQuantity={updateQuantity}
-          onRemove={removeFromCart}
-          onCheckout={handleCheckout}
-          isCheckoutDisabled={cartItems.length === 0}
-        />
-      </aside>
+      {isCartVisible && (
+        <aside className="w-80 lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
+          <div className="mb-8 flex items-center justify-between">
+            <h3 className="text-2xl font-semibold">Meu Carrinho</h3>
+          </div>
+          <CartContent
+            cartItems={cartItems}
+            cartTotal={cartTotal}
+            onUpdateQuantity={updateQuantity}
+            onRemove={removeFromCart}
+            onCheckout={handleCheckout}
+            isCheckoutDisabled={cartItems.length === 0}
+          />
+        </aside>
+      )}
 
       {/* Mobile Cart Drawer */}
       <CartDrawer
