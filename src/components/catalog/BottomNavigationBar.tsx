@@ -18,13 +18,16 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
         {/* Home */}
         <button
           onClick={() => onTabChange('home')}
-          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'home'
               ? 'text-[#415444]'
               : 'text-gray-500 hover:text-gray-700'
           }`}
           aria-label="Início"
         >
+          {activeTab === 'home' && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#415444] rounded-b-full" />
+          )}
           <FaHome className="h-6 w-6 mb-1" />
           <span className="text-xs font-medium">Início</span>
         </button>
@@ -32,13 +35,16 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
         {/* Search */}
         <button
           onClick={() => onTabChange('search')}
-          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'search'
               ? 'text-[#415444]'
               : 'text-gray-500 hover:text-gray-700'
           }`}
           aria-label="Buscar"
         >
+          {activeTab === 'search' && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#415444] rounded-b-full" />
+          )}
           <FaSearch className="h-6 w-6 mb-1" />
           <span className="text-xs font-medium">Buscar</span>
         </button>
@@ -53,6 +59,9 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
           }`}
           aria-label="Carrinho"
         >
+          {activeTab === 'cart' && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#415444] rounded-b-full" />
+          )}
           <div className="relative">
             <FaShoppingCart className="h-6 w-6 mb-1" />
             {cartItemsCount > 0 && (
@@ -67,13 +76,16 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
         {/* Profile */}
         <button
           onClick={() => onTabChange('profile')}
-          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'profile'
               ? 'text-[#415444]'
               : 'text-gray-500 hover:text-gray-700'
           }`}
           aria-label="Perfil"
         >
+          {activeTab === 'profile' && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#415444] rounded-b-full" />
+          )}
           <FaUser className="h-6 w-6 mb-1" />
           <span className="text-xs font-medium">Perfil</span>
         </button>
