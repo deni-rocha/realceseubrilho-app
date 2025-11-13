@@ -125,7 +125,13 @@ const SupportWidget: React.FC<SupportWidgetProps> = ({
       buildMailtoUrl(
         supportEmail,
         `[Suporte] Ajuda - ${businessName}`,
-        `Olá, equipe ${businessName}!\n\nPreciso de suporte. Seguem alguns detalhes:\n- ${pageInfo}\n- Descrição do problema:\n\nObrigado(a)!`,
+        `Olá, equipe ${businessName}!
+
+Preciso de suporte. Seguem alguns detalhes:
+- ${pageInfo}
+- Descrição do problema:
+
+Obrigado(a)!`,
       ),
     [supportEmail, businessName, pageInfo],
   );
@@ -148,7 +154,7 @@ const SupportWidget: React.FC<SupportWidgetProps> = ({
       />
 
       {/* Main Content */}
-      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto pb-8">
+      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto pb-8 lg:ml-64">
         {/* Back Button */}
         <div className="mb-6">
           <button

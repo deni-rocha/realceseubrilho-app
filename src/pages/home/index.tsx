@@ -344,7 +344,7 @@ const Home: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto pb-20 lg:pb-8">
+      <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto pb-20 lg:pb-8 lg:ml-64">
         {/* Mobile Profile Bar - Only show when profile tab is active */}
         {mobileActiveTab === 'profile' && (
           <ProfileBar
@@ -379,8 +379,8 @@ const Home: React.FC = () => {
           mobileActiveTab === 'search' ||
           window.innerWidth >= 1024) && (
           <>
-            {/* Banner Cards - Hide when searching (mobile) */}
-            {!searchTerm && mobileActiveTab !== 'search' && <BannerCards />}
+            {/* Banner Cards - Hide when searching on mobile only */}
+            {((!searchTerm && mobileActiveTab !== 'search') || window.innerWidth >= 1024) && <BannerCards />}
 
             {/* Advanced Filter and Products Layout */}
             <div className="flex flex-col lg:flex-row gap-6 mt-8">

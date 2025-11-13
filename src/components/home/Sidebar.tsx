@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <aside className="w-64 border-r border-gray-200 px-6 py-8 hidden lg:block">
+    <aside className="fixed w-64 border-r border-gray-200 px-6 py-8 hidden lg:block h-screen overflow-y-auto" style={{ top: 0, left: 0 }}>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#415444]">Realce Seu Brilho</h1>
       </div>
