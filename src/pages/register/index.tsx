@@ -12,7 +12,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { User } from '../../types/User';
 import api from '../../api';
 import type { ApiError } from '../../types/ApiError';
@@ -40,6 +40,7 @@ type FormData = z.infer<typeof formSchema>;
 const FormUser: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
   // 2. Gerenciamento do Formulário com useForm e zodResolver
   const {
@@ -77,7 +78,29 @@ const FormUser: React.FC = () => {
 
   return (
     <div className="relative flex text-sm items-center justify-center min-h-screen bg-white dark:bg-primary-dark overflow-hidden">
-      <div className="relative z-10 w-full max-w-sm p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors z-20"
+        aria-label="Voltar à página anterior"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Voltar
+      </button>
+      <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
+        
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6 mb-8">
             {/* Campo Nome */}
