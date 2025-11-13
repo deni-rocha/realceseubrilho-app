@@ -51,7 +51,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
   
   // Determine which state to use
   const effectiveIsOpen = isControlled ? isOpen : uncontrolledIsOpen;
-  const setIsOpen = isControlled ? onOpenChange : setUncontrolledIsOpen;
   
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
