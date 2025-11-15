@@ -99,12 +99,12 @@ const Login = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            <a
-              href="#"
+            <Link
+              to="/reset-password"
               className="block text-right text-gray-500 hover:underline dark:text-gray-300"
             >
               Esqueceu sua senha?
-            </a>
+            </Link>
           </div>
 
           <div className="flex justify-center mb-8">

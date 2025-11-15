@@ -14,6 +14,8 @@ import SupportWidget from './components/SupportWidget.tsx';
 import CustomerProfile from './pages/customer';
 import FinancialCharts from './components/admin/charts/FinancialCharts';
 import DashboardWithCharts from './components/admin/DashboardWithCharts';
+import RequestResetPassword from './pages/resetPassword/request';
+import ResetPasswordForm from './pages/resetPassword';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -36,6 +38,8 @@ function App() {
 
           {/* Rotas de login e painéis */}
           <Route path="login" element={<Login />} />
+          <Route path="reset-password" element={<RequestResetPassword />} />
+          <Route path="reset-password/form" element={<ResetPasswordForm />} />
           <Route
             path="admin"
             element={
