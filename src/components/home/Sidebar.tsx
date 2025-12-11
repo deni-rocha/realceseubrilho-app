@@ -52,22 +52,25 @@ const Sidebar: React.FC<SidebarProps> = ({
           <FaHome className="h-5 w-5" />
           Catálogo
         </Link>
+        
+        {/* Profile/Login Section - Always visible in desktop mode */}
+        <Link
+          to={isAuthenticated ? "/customer" : "/login"}
+          className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
+            (isAuthenticated && isActive('/customer')) || (!isAuthenticated && isActive('/login'))
+              ? 'text-[#415444] font-semibold'
+              : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          {(isAuthenticated && isActive('/customer')) || (!isAuthenticated && isActive('/login')) && (
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
+          )}
+          <FaUser className="h-5 w-5" />
+          {isAuthenticated ? 'Perfil' : 'Entrar'}
+        </Link>
+        
         {isAuthenticated && (
           <>
-            <Link
-              to="/customer"
-              className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
-                isActive('/customer')
-                  ? 'text-[#415444] font-semibold'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {isActive('/customer') && (
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
-              )}
-              <FaUser className="h-5 w-5" />
-              Perfil
-            </Link>
             <button
               type="button"
               className="flex items-center gap-3 px-3 py-2 text-gray-500 transition-colors hover:text-gray-900 w-full text-left cursor-pointer"
@@ -121,11 +124,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               : 'text-gray-500 hover:text-gray-900'
           }`}
         >
-          {isActive('/support') && (
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
-          )}
-          <FaHeadset className="h-5 w-5" />
-          Suporte
+        {isActive('/support') && (
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
+        )}
+        <FaHeadset className="h-5 w-5" />
+        Suporte
         </Link>
 
         {isAuthenticated && (

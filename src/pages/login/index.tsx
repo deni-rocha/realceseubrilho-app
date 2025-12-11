@@ -7,22 +7,42 @@ import {
   FaEye,
   FaEyeSlash,
   FaUserSecret,
+  FaExclamationCircle,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Schema de validação com Zod
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email é obrigatório')
+    .email('Email inválido'),
+  password: z
+    .string()
+    .min(6, 'Senha deve ter pelo menos 6 caracteres')
+    .max(50, 'Senha não pode ter mais de 50 caracteres'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const [data, setData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const { login, status, error, user } = useAuthStore();
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setData({ ...data, [e.target.name]: e.target.value });
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function onSubmit(data: LoginFormData) {
     login({ email: data.email, password: data.password });
   }
 
@@ -64,7 +84,7 @@ const Login = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6 mb-8">
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white">
@@ -73,12 +93,21 @@ const Login = () => {
               <input
                 type="text"
                 placeholder="E-mail"
-                className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-full focus:ring-2 focus:ring-green-400 focus:outline-none dark:text-white dark:border-black dark:focus:ring-yellow-300"
-                name="email"
-                value={data.email}
-                onChange={handleChange}
+                className={`w-full pl-12 pr-4 py-3 border rounded-full focus:ring-2 focus:outline-none ${
+                  errors.email 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-300'
+                }`}
+                {...register('email')}
               />
+              {errors.email && (
+                <div className=" flex items-center mt-1 text-red-500 text-sm">
+                  <FaExclamationCircle className="mr-1" />
+                  <span>{errors.email.message}</span>
+                </div>
+              )}
             </div>
+            
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white">
                 <FaLock />
@@ -86,10 +115,12 @@ const Login = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Senha"
-                className="w-full pl-12 pr-12 py-3 border border-gray-400 rounded-full focus:ring-2 focus:ring-green-400 focus:outline-none dark:text-white dark:border-black dark:focus:ring-yellow-300"
-                name="password"
-                value={data.password}
-                onChange={handleChange}
+                className={`w-full pl-12 pr-12 py-3 border rounded-full focus:ring-2 focus:outline-none ${
+                  errors.password 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-400 focus:ring-green-400 dark:border-black dark:focus:ring-yellow-300'
+                }`}
+                {...register('password')}
               />
               <button
                 type="button"
@@ -98,7 +129,14 @@ const Login = () => {
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
+              {errors.password && (
+                <div className="flex items-center mt-1 text-red-500 text-sm">
+                  <FaExclamationCircle className="mr-1" />
+                  <span>{errors.password.message}</span>
+                </div>
+              )}
             </div>
+            
             <Link
               to="/reset-password"
               className="block text-right text-gray-500 hover:underline dark:text-gray-300"
@@ -110,7 +148,6 @@ const Login = () => {
           <div className="flex justify-center mb-8">
             <button
               type="submit"
-              onClick={handleSubmit}
               disabled={status === 'loading'}
               className="flex items-center justify-center px-8 py-3 text-sm sm:text-lg text-white font-semibold bg-gradient-to-r from-green-800 to-green-600 rounded-full shadow-lg hover:from-green-700 hover:to-green-500 focus:outline-none focus:ring-4 focus:ring-green-400 transform transition-transform duration-200 hover:scale-105 cursor-pointer disabled:from-green-500 disabled:to-green-400 disabled:cursor-not-allowed dark:from-yellow-500 dark:to-yellow-600 dark:hover:from-yellow-600 dark:hover:to-yellow-700 dark:focus:ring-yellow-300 dark:disabled:from-yellow-400 dark:disabled:to-yellow-500"
             >
