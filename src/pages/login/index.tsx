@@ -87,7 +87,7 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6 mb-8">
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white">
+              <span className={`absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white ${errors.email ? '-top-6' : ''}`}>
                 <FaUser />
               </span>
               <input
@@ -109,7 +109,7 @@ const Login = () => {
             </div>
             
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white">
+              <span className={`absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-white ${errors.password ? '-top-6' : ''}`}>
                 <FaLock />
               </span>
               <input
@@ -125,7 +125,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
+                className={`absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 ${errors.password ? '-top-6' : ''}`}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
