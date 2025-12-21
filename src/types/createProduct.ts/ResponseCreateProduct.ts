@@ -5,8 +5,11 @@ export interface ResponseCreateProduct {
   name: string;
   description: string;
   price: string;
-  cost?: number;
+  cost?: string;
   stockQuantity: number;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  salePrice?: string;
   imageUrls: string[];
   createdAt: string;
   updatedAt: string;

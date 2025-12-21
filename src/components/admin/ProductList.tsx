@@ -25,6 +25,9 @@ interface IProduct {
   createdAt: string;
   updatedAt: string;
   categories: IProductCategory[];
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  salePrice?: string;
 }
 
 const ProductList: React.FC = () => {
@@ -224,21 +227,37 @@ const ProductList: React.FC = () => {
                   className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden transition-transform hover:scale-[1.02]"
                 >
                   {/* Imagem do Produto */}
-                  {product.imageUrls && product.imageUrls.length > 0 ? (
-                    <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                      <img
-                        src={product.imageUrls[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
+                  <div className="relative">
+                    {product.imageUrls && product.imageUrls.length > 0 ? (
+                      <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                        <img
+                          src={product.imageUrls[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <span className="text-gray-400 dark:text-gray-500">
+                          Sem imagem
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Badges */}
+                    <div className="absolute top-2 right-2 flex flex-col gap-2">
+                      {product.isFeatured && (
+                        <span className="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full shadow-lg">
+                          ⭐ DESTAQUE
+                        </span>
+                      )}
+                      {product.isOnSale && (
+                        <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg">
+                          🔥 PROMOÇÃO
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      <span className="text-gray-400 dark:text-gray-500">
-                        Sem imagem
-                      </span>
-                    </div>
-                  )}
+                  </div>
 
                   {/* Conteúdo do Card */}
                   <div className="p-6">
@@ -246,9 +265,22 @@ const ProductList: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {product.name}
                       </h3>
-                      <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                        {product.price}
-                      </span>
+                      <div className="flex flex-col items-end">
+                        {product.isOnSale && product.salePrice ? (
+                          <>
+                            <span className="text-sm line-through text-gray-400 dark:text-gray-500">
+                              R$ {product.price}
+                            </span>
+                            <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                              R$ {product.salePrice}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                            R$ {product.price}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">

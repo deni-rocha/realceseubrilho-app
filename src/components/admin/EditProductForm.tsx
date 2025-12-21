@@ -18,8 +18,11 @@ interface ProductFormData {
   description?: string;
   stockQuantity?: number;
   price?: string;
-  cost?: number;
+  cost?: string;
   categoryIds?: string[];
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  salePrice?: string;
 }
 
 interface EditProductFormProps {
@@ -125,6 +128,9 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         price: product.price,
         cost: product.cost,
         categoryIds: product.categories?.map((cat) => cat.id) || [],
+        isFeatured: product.isFeatured || false,
+        isOnSale: product.isOnSale || false,
+        salePrice: product.salePrice || '',
       });
 
       // Carregar imagens existentes
@@ -144,11 +150,29 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'stockQuantity' ? Number(value) : value,
-    }));
+    const { name, value, type } = e.target;
+
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => {
+        const newData = {
+          ...prev,
+          [name]: checked,
+        };
+
+        // Se desmarcar "Em Promoção", limpar o preço promocional
+        if (name === 'isOnSale' && !checked) {
+          newData.salePrice = '';
+        }
+
+        return newData;
+      });
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === 'stockQuantity' ? Number(value) : value,
+      }));
+    }
   };
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -224,8 +248,57 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       return;
     }
 
+    // Validar preço promocional se produto está em promoção
+    if (formData.isOnSale) {
+      if (!formData.salePrice || parseFloat(formData.salePrice) <= 0) {
+        toast.error('Informe o preço promocional para produtos em promoção');
+        return;
+      }
+
+      if (
+        formData.price &&
+        parseFloat(formData.salePrice) >= parseFloat(formData.price)
+      ) {
+        toast.error('O preço promocional deve ser menor que o preço de venda');
+        return;
+      }
+    }
+
+    // Preparar dados para envio
+    const dataToSend: ProductFormData = {
+      name: formData.name,
+      description: formData.description,
+      stockQuantity: formData.stockQuantity,
+      price: formData.price,
+      categoryIds: formData.categoryIds,
+      isFeatured: formData.isFeatured,
+      isOnSale: formData.isOnSale,
+      // Enviar cost apenas se tiver valor (string não vazia)
+      cost:
+        formData.cost && formData.cost.trim() !== ''
+          ? formData.cost
+          : undefined,
+      // Enviar salePrice apenas se produto está em promoção e tem valor válido
+      salePrice:
+        formData.isOnSale && formData.salePrice
+          ? formData.salePrice
+          : undefined,
+    };
+
     // Enviar apenas os campos esperados pelo backend
-    updateProductMutation.mutate(formData);
+    updateProductMutation.mutate(dataToSend);
+  };
+
+  // Calcular desconto percentual
+  const calculateDiscount = () => {
+    if (formData.price && formData.salePrice) {
+      const price = parseFloat(formData.price);
+      const salePrice = parseFloat(formData.salePrice);
+      if (price > 0 && salePrice > 0 && salePrice < price) {
+        return Math.round(((price - salePrice) / price) * 100);
+      }
+    }
+    return 0;
   };
 
   if (isLoadingProduct) {
@@ -314,6 +387,112 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
             required
           />
         </div>
+      </div>
+
+      {/* Seção de Destaque e Promoção */}
+      <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
+          Destaque e Promoção
+        </h3>
+
+        {/* Checkbox Produto em Destaque */}
+        <div className="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id="isFeatured"
+            name="isFeatured"
+            checked={formData.isFeatured || false}
+            onChange={handleInputChange}
+            className="h-4 w-4 text-yellow-500 border-gray-300 rounded focus:ring-yellow-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+          />
+          <label
+            htmlFor="isFeatured"
+            className="flex items-center space-x-2 cursor-pointer"
+          >
+            <span className="text-sm text-gray-700 dark:text-gray-200">
+              ⭐ Produto em Destaque
+            </span>
+          </label>
+          {formData.isFeatured && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+              Destaque Ativo
+            </span>
+          )}
+        </div>
+        <span className="text-xs text-gray-500 dark:text-gray-400 block ml-7">
+          Produtos em destaque aparecem na seção especial da loja
+        </span>
+
+        {/* Checkbox Produto em Promoção */}
+        <div className="flex items-center space-x-3 mt-4">
+          <input
+            type="checkbox"
+            id="isOnSale"
+            name="isOnSale"
+            checked={formData.isOnSale || false}
+            onChange={handleInputChange}
+            className="h-4 w-4 text-red-500 border-gray-300 rounded focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+          />
+          <label
+            htmlFor="isOnSale"
+            className="flex items-center space-x-2 cursor-pointer"
+          >
+            <span className="text-sm text-gray-700 dark:text-gray-200">
+              🔥 Produto em Promoção
+            </span>
+          </label>
+          {formData.isOnSale && (
+            <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300 animate-pulse">
+              Promoção Ativa
+            </span>
+          )}
+        </div>
+
+        {/* Campo de Preço Promocional - aparece apenas quando isOnSale está marcado */}
+        {formData.isOnSale && (
+          <div className="ml-7 mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <label className="block text-sm font-medium text-red-700 dark:text-red-300 mb-2">
+              Preço Promocional *
+            </label>
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <input
+                  type="number"
+                  name="salePrice"
+                  value={formData.salePrice || ''}
+                  onChange={handleInputChange}
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  className="block w-full rounded-md border border-red-300 px-3 py-2 dark:bg-gray-700 dark:border-red-600 dark:text-white focus:ring-red-500 focus:border-red-500"
+                  required={formData.isOnSale}
+                />
+              </div>
+              {calculateDiscount() > 0 && (
+                <div className="flex items-center space-x-2">
+                  <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded">
+                    -{calculateDiscount()}%
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                    R$ {parseFloat(formData.price || '0').toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </div>
+            <span className="text-xs text-red-600 dark:text-red-400 mt-2 block">
+              O preço promocional deve ser menor que o preço de venda (R${' '}
+              {parseFloat(formData.price || '0').toFixed(2)})
+            </span>
+            {formData.salePrice && formData.price && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                💰 Cliente economiza: R${' '}
+                {(
+                  parseFloat(formData.price) - parseFloat(formData.salePrice)
+                ).toFixed(2)}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { CartProvider } from './hooks/useCart';
 import AdminPainel from './pages/admin';
 import Login from './pages/login';
 import Layout from './components/Layout';
@@ -22,50 +23,52 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          {/* Rota principal com redirecionamento */}
-          <Route
-            path="/"
-            element={
-              isAuthenticated && role === 'ADMIN' ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Navigate to="/home" replace />
-              )
-            }
-          />
+      <CartProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            {/* Rota principal com redirecionamento */}
+            <Route
+              path="/"
+              element={
+                isAuthenticated && role === 'ADMIN' ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Navigate to="/home" replace />
+                )
+              }
+            />
 
-          {/* Rotas de login e painéis */}
-          <Route path="login" element={<Login />} />
-          <Route path="reset-password" element={<RequestResetPassword />} />
-          <Route path="reset-password/form" element={<ResetPasswordForm />} />
-          <Route
-            path="admin"
-            element={
-              <PrivateRoute roleProp="ADMIN">
-                <AdminPainel />
-              </PrivateRoute>
-            }
-          />
+            {/* Rotas de login e painéis */}
+            <Route path="login" element={<Login />} />
+            <Route path="reset-password" element={<RequestResetPassword />} />
+            <Route path="reset-password/form" element={<ResetPasswordForm />} />
+            <Route
+              path="admin"
+              element={
+                <PrivateRoute roleProp="ADMIN">
+                  <AdminPainel />
+                </PrivateRoute>
+              }
+            />
 
-          <Route path="/admin/charts" element={<FinancialCharts />} />
-          <Route
-            path="/admin/dashboard-charts"
-            element={<DashboardWithCharts />}
-          />
-          <Route path="/home" element={<Home />} />
-          <Route path="/customer" element={<CustomerProfile />} />
-          <Route path="*" element={<NotFound />} />
-          <Route path="register-user" element={<RegisterUser />} />
-          <Route path="verify-email" element={<VerifyEmail />} />
-          <Route path="support" element={<SupportWidget />} />
-          <Route
-            path="request-email-verification"
-            element={<RequestEmailVerification />}
-          />
-        </Route>
-      </Routes>
+            <Route path="/admin/charts" element={<FinancialCharts />} />
+            <Route
+              path="/admin/dashboard-charts"
+              element={<DashboardWithCharts />}
+            />
+            <Route path="/home" element={<Home />} />
+            <Route path="/customer" element={<CustomerProfile />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="register-user" element={<RegisterUser />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
+            <Route path="support" element={<SupportWidget />} />
+            <Route
+              path="request-email-verification"
+              element={<RequestEmailVerification />}
+            />
+          </Route>
+        </Routes>
+      </CartProvider>
     </BrowserRouter>
   );
 }

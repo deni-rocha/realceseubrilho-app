@@ -3,12 +3,9 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import publicApi from '../../api/publicApi';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
+import { useCart } from '../../hooks/useCart';
 import { createGuestOrder } from '../../api/orders';
-import type {
-  IProduct,
-  CartItem,
-  GuestCheckoutData,
-} from '../../types/catalog';
+import type { IProduct, GuestCheckoutData } from '../../types/catalog';
 
 // Import reusable components
 import Sidebar from '../../components/home/Sidebar';
@@ -25,30 +22,40 @@ import GuestCheckoutModal from '../../components/home/GuestCheckoutModal';
 import BottomNavigationBar from '../../components/home/BottomNavigationBar';
 import ProfileBar from '../../components/home/ProfileBar';
 import MobileSearchBar from '../../components/home/MobileSearchBar';
-import Toast, { type ToastType } from '../../components/home/Toast';
+import Toast from '../../components/home/Toast';
 
 const Home: React.FC = () => {
-  // State
+  // Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortBy, setSortBy] = useState<FilterOptions['sortBy']>('newest');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  // UI State
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCartVisible, setIsCartVisible] = useState(true); // New state for desktop cart visibility
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [mobileActiveTab, setMobileActiveTab] = useState<
     'home' | 'search' | 'cart' | 'profile'
   >('home');
-  const [toast, setToast] = useState<{
-    message: string;
-    type: ToastType;
-  } | null>(null);
-
-  // State for filter visibility
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Cart Hook - usando o contexto global
+  const {
+    cartItems,
+    cartTotal,
+    cartItemsCount,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    isCartOpen,
+    setIsCartOpen,
+    isCartVisible,
+    setIsCartVisible,
+    toast,
+    setToast,
+  } = useCart();
 
   // Auth
   const { isAuthenticated } = useAuth();
@@ -79,7 +86,7 @@ const Home: React.FC = () => {
     },
     onSuccess: (data) => {
       // Limpar carrinho
-      setCartItems([]);
+      clearCart();
       setIsCheckoutModalOpen(false);
       setIsCartOpen(false);
 
@@ -176,93 +183,6 @@ const Home: React.FC = () => {
     inStockOnly,
   ]);
 
-  // Cart handlers
-  const updateQuantity = useCallback((itemId: string, change: number) => {
-    setCartItems(
-      (prevItems) =>
-        prevItems
-          .map((item) => {
-            if (item.id === itemId) {
-              const newQuantity = Math.max(0, item.quantity + change);
-              if (newQuantity === 0) return null;
-
-              // Verificar se não ultrapassa o estoque disponível
-              if (newQuantity > item.stockQuantity) {
-                setToast({
-                  message: `Estoque limitado! Disponível: ${item.stockQuantity} unidades`,
-                  type: 'warning',
-                });
-                return item; // Mantém a quantidade atual
-              }
-
-              return { ...item, quantity: newQuantity };
-            }
-            return item;
-          })
-          .filter(Boolean) as CartItem[],
-    );
-  }, []);
-
-  const removeFromCart = useCallback((itemId: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
-  }, []);
-
-  const addToCart = useCallback((product: IProduct) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (cartItem) => cartItem.id === product.id,
-      );
-      if (existingItem) {
-        // Verificar se já não atingiu o limite de estoque
-        if (existingItem.quantity >= product.stockQuantity) {
-          setToast({
-            message: `Estoque limitado! Disponível: ${product.stockQuantity} unidades`,
-            type: 'warning',
-          });
-          return prevItems; // Não adiciona mais
-        }
-
-        // Adicionar notificação de sucesso ao incrementar
-        setToast({
-          message: `${product.name} adicionado ao carrinho!`,
-          type: 'success',
-        });
-
-        return prevItems.map((cartItem) =>
-          cartItem.id === product.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem,
-        );
-      }
-
-      // Verificar estoque antes de adicionar novo item
-      if (product.stockQuantity < 1) {
-        setToast({
-          message: 'Produto sem estoque!',
-          type: 'error',
-        });
-        return prevItems;
-      }
-
-      // Adicionar notificação de sucesso
-      setToast({
-        message: `${product.name} adicionado ao carrinho!`,
-        type: 'success',
-      });
-
-      return [...prevItems, { ...product, quantity: 1, selectedSize: 'M' }];
-    });
-  }, []);
-
-  const calculateTotal = useCallback((items: CartItem[]) => {
-    return items.reduce(
-      (total, item) => total + parseFloat(item.price) * item.quantity,
-      0,
-    );
-  }, []);
-
-  const cartTotal = calculateTotal(cartItems);
-
   // Checkout handlers
   const handleCheckout = useCallback(() => {
     if (cartItems.length === 0) return;
@@ -311,7 +231,7 @@ const Home: React.FC = () => {
         setIsCartOpen(false);
       }
     },
-    [],
+    [setIsCartOpen],
   );
 
   // Loading state
@@ -337,10 +257,10 @@ const Home: React.FC = () => {
       {/* Sidebar - Desktop */}
       <Sidebar
         isAuthenticated={isAuthenticated}
-        cartItemsCount={cartItems.length}
+        cartItemsCount={cartItemsCount}
         onLogout={logout}
         onToggleCart={() => setIsCartVisible(!isCartVisible)}
-        isCartVisible={isCartVisible} // Pass the cart visibility state
+        isCartVisible={isCartVisible}
       />
 
       {/* Main Content */}
@@ -380,7 +300,8 @@ const Home: React.FC = () => {
           window.innerWidth >= 1024) && (
           <>
             {/* Banner Cards - Hide when searching on mobile only */}
-            {((!searchTerm && mobileActiveTab !== 'search') || window.innerWidth >= 1024) && <BannerCards />}
+            {((!searchTerm && mobileActiveTab !== 'search') ||
+              window.innerWidth >= 1024) && <BannerCards />}
 
             {/* Advanced Filter and Products Layout */}
             <div className="flex flex-col lg:flex-row gap-6 mt-8">
@@ -501,7 +422,7 @@ const Home: React.FC = () => {
       {/* Mobile Bottom Navigation - Hide when filter is open */}
       <BottomNavigationBar
         activeTab={mobileActiveTab}
-        cartItemsCount={cartItems.length}
+        cartItemsCount={cartItemsCount}
         onTabChange={handleMobileTabChange}
         onClearSearch={() => setSearchTerm('')}
         isHidden={isFilterOpen}

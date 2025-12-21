@@ -9,9 +9,13 @@ export interface IProduct {
   name: string;
   description: string;
   price: string;
+  cost?: string;
   stockQuantity: number;
   imageUrls: string[];
   categories: IProductCategory[];
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  salePrice?: string;
 }
 
 export interface CartItem extends IProduct {

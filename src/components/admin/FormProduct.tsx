@@ -40,10 +40,21 @@ const productSchema = z.object({
     .min(0, 'O preço não pode ser negativo')
     .multipleOf(0.01, 'O preço deve ter no máximo 2 casas decimais'),
   cost: z
-    .number()
-    .min(0, 'O custo não pode ser negativo')
-    .multipleOf(0.01, 'O custo deve ter no máximo 2 casas decimais')
-    .optional(),
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
+      'O custo deve ser um valor válido e não negativo',
+    ),
+  isFeatured: z.boolean().optional(),
+  isOnSale: z.boolean().optional(),
+  salePrice: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
+      'O preço promocional deve ser um valor válido e não negativo',
+    ),
   categoryId: z.string().min(1, 'Selecione uma categoria'),
   image: z.any().optional(),
 });
@@ -149,16 +160,30 @@ const FormProduct: React.FC = () => {
       setIsSubmitting(true);
 
       // Primeiro, criar o produto
+      // Preparar dados - converter price para string e tratar campos opcionais
+      const productData: Record<string, unknown> = {
+        name: data.name,
+        description: data.description,
+        stockQuantity: data.stockQuantity,
+        price: data.price.toFixed(2),
+        categoryIds: [data.categoryId],
+        isFeatured: data.isFeatured || false,
+        isOnSale: data.isOnSale || false,
+      };
+
+      // Enviar cost apenas se tiver valor válido
+      if (data.cost && data.cost.trim() !== '') {
+        productData.cost = data.cost;
+      }
+
+      // Enviar salePrice apenas se produto está em promoção
+      if (data.isOnSale && data.salePrice && data.salePrice.trim() !== '') {
+        productData.salePrice = data.salePrice;
+      }
+
       const productResponse = await api.post<ResponseCreateProduct>(
         '/products',
-        {
-          name: data.name,
-          description: data.description,
-          stockQuantity: data.stockQuantity,
-          price: data.price,
-          cost: data.cost,
-          categoryId: data.categoryId,
-        },
+        productData,
       );
 
       // Se tiver imagens selecionadas, fazer o upload de todas
@@ -409,7 +434,7 @@ const FormProduct: React.FC = () => {
               type="number"
               id="cost"
               step="0.01"
-              {...register('cost', { valueAsNumber: true })}
+              {...register('cost')}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               min="0"
               placeholder="0.00"
@@ -420,6 +445,89 @@ const FormProduct: React.FC = () => {
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Custo de aquisição para cálculo de lucro
             </p>
+          </div>
+        </div>
+
+        {/* Seção de Destaque e Promoção */}
+        <div className="border-t border-gray-300 dark:border-gray-600 pt-6">
+          <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">
+            Configurações Especiais
+          </h3>
+
+          <div className="space-y-4">
+            {/* Produto em Destaque */}
+            <div className="flex items-start space-x-3">
+              <div className="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  id="isFeatured"
+                  {...register('isFeatured')}
+                  className="h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                />
+              </div>
+              <div className="flex-1">
+                <label
+                  htmlFor="isFeatured"
+                  className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
+                >
+                  ⭐ Produto em Destaque
+                </label>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Marque para exibir este produto na seção de destaques
+                </p>
+              </div>
+            </div>
+
+            {/* Produto em Promoção */}
+            <div className="flex items-start space-x-3">
+              <div className="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  id="isOnSale"
+                  {...register('isOnSale')}
+                  className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                />
+              </div>
+              <div className="flex-1">
+                <label
+                  htmlFor="isOnSale"
+                  className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
+                >
+                  🔥 Produto em Promoção
+                </label>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Marque para indicar que este produto está em promoção
+                </p>
+              </div>
+            </div>
+
+            {/* Preço Promocional - Aparece apenas se isOnSale estiver marcado */}
+            <div className="ml-7">
+              <label
+                htmlFor="salePrice"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                Preço Promocional (Opcional)
+              </label>
+              <input
+                type="number"
+                id="salePrice"
+                step="0.01"
+                {...register('salePrice')}
+                className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                min="0"
+                placeholder="0.00"
+              />
+              {errors.salePrice && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.salePrice.message}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Preço com desconto que será exibido quando o produto estiver em
+                promoção
+              </p>
+            </div>
           </div>
         </div>
 
