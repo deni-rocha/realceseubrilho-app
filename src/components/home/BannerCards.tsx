@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart } from 'react-icons/fa';
+import {
+  FaShoppingCart,
+  FaSearch,
+  FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+} from 'react-icons/fa';
 import publicApi from '../../api/publicApi';
 import { useCart } from '../../hooks/useCart';
 import type { IProduct } from '../../types/catalog';
@@ -28,19 +33,9 @@ interface IBannerProduct {
 }
 
 const BannerCards: React.FC = () => {
-  const navigate = useNavigate();
   const { addToCart } = useCart();
-
-  // Buscar produto em destaque
-  const { data: featuredProducts, isLoading: isLoadingFeatured } = useQuery({
-    queryKey: ['featuredProduct'],
-    queryFn: async () => {
-      const response = await publicApi.get<IBannerProduct[]>(
-        '/products/public/featured',
-      );
-      return response.data;
-    },
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Buscar produto em promoção
   const { data: saleProducts, isLoading: isLoadingSale } = useQuery({
@@ -53,7 +48,6 @@ const BannerCards: React.FC = () => {
     },
   });
 
-  const featuredProduct = featuredProducts?.[0];
   const saleProduct = saleProducts?.[0];
 
   // Calcular desconto percentual
@@ -93,22 +87,36 @@ const BannerCards: React.FC = () => {
     e.stopPropagation();
     const cartProduct = convertToCartProduct(product);
     addToCart(cartProduct);
+    setIsModalOpen(false);
   };
 
-  const handleProductClick = (productId: string) => {
-    navigate(`/produto/${productId}`);
+  const handleOpenModal = () => {
+    setCurrentImageIndex(0);
+    setIsModalOpen(true);
   };
 
-  // Skeleton Loading para o card de destaque
-  const FeaturedSkeleton = () => (
-    <div className="bg-[#e0e5ce] border-0 rounded-[24px] p-6 animate-pulse">
-      <div className="h-4 w-32 bg-[#338838]/30 rounded mb-2"></div>
-      <div className="h-8 w-3/4 bg-gray-400/30 rounded mb-4"></div>
-      <div className="h-4 w-full bg-gray-400/20 rounded mb-2"></div>
-      <div className="h-4 w-2/3 bg-gray-400/20 rounded mb-6"></div>
-      <div className="h-10 w-28 bg-[#415444]/50 rounded-lg"></div>
-    </div>
-  );
+  const handleCloseModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsModalOpen(false);
+  };
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (saleProduct?.imageUrls) {
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? saleProduct.imageUrls.length - 1 : prev - 1,
+      );
+    }
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (saleProduct?.imageUrls) {
+      setCurrentImageIndex((prev) =>
+        prev === saleProduct.imageUrls.length - 1 ? 0 : prev + 1,
+      );
+    }
+  };
 
   // Skeleton Loading para o card de promoção
   const SaleSkeleton = () => (
@@ -124,184 +132,217 @@ const BannerCards: React.FC = () => {
     </div>
   );
 
-  return (
-    <div className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Banner Produto em Destaque */}
-      {isLoadingFeatured ? (
-        <FeaturedSkeleton />
-      ) : featuredProduct ? (
-        <div
-          className="bg-[#e0e5ce] border-0 rounded-[24px] p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group relative overflow-hidden"
-          onClick={() => handleProductClick(featuredProduct.id)}
-        >
-          {/* Imagem de fundo sutil */}
-          {featuredProduct.imageUrls?.[0] && (
-            <div
-              className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300"
-              style={{
-                backgroundImage: `url(${featuredProduct.imageUrls[0]})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-          )}
+  // Modal compacto de visualização do produto
+  const ProductModal = () => {
+    if (!saleProduct) return null;
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium uppercase text-[#338838]">
-                ⭐ EM DESTAQUE
-              </span>
-              {featuredProduct.category && (
-                <span className="text-xs bg-[#338838]/20 text-[#338838] px-2 py-0.5 rounded-full">
-                  {featuredProduct.category.name}
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        onClick={handleCloseModal}
+      >
+        <div
+          className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header com botão fechar */}
+          <div className="flex items-center justify-between p-3 border-b bg-gray-50">
+            <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+              {saleProduct.name}
+            </h2>
+            <button
+              onClick={handleCloseModal}
+              className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              <FaTimes className="text-gray-500 text-sm" />
+            </button>
+          </div>
+
+          {/* Imagem do Produto */}
+          <div className="relative bg-gray-100">
+            {saleProduct.imageUrls && saleProduct.imageUrls.length > 0 ? (
+              <>
+                <div className="h-64 flex items-center justify-center">
+                  <img
+                    src={saleProduct.imageUrls[currentImageIndex]}
+                    alt={saleProduct.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+
+                {/* Navegação de imagens */}
+                {saleProduct.imageUrls.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePrevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-all"
+                    >
+                      <FaChevronLeft className="text-gray-700 text-sm" />
+                    </button>
+                    <button
+                      onClick={handleNextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-all"
+                    >
+                      <FaChevronRight className="text-gray-700 text-sm" />
+                    </button>
+
+                    {/* Indicadores */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {saleProduct.imageUrls.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(index);
+                          }}
+                          className={`w-1.5 h-1.5 rounded-full transition-all ${
+                            index === currentImageIndex
+                              ? 'bg-[#415444] w-3'
+                              : 'bg-gray-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="h-64 flex items-center justify-center">
+                <span className="text-gray-400">Sem imagem</span>
+              </div>
+            )}
+          </div>
+
+          {/* Preço e Botão */}
+          <div className="p-4 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                {saleProduct.salePrice && (
+                  <span className="text-gray-400 line-through text-sm">
+                    R$ {parseFloat(saleProduct.price).toFixed(2)}
+                  </span>
+                )}
+                <span className="text-xl font-bold text-red-600">
+                  R${' '}
+                  {parseFloat(
+                    saleProduct.salePrice || saleProduct.price,
+                  ).toFixed(2)}
+                </span>
+              </div>
+              {saleProduct.salePrice && (
+                <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  -{calculateDiscount(saleProduct.price, saleProduct.salePrice)}
+                  %
                 </span>
               )}
             </div>
 
-            <h3 className="mb-2 text-2xl font-semibold text-gray-800 line-clamp-2 group-hover:text-[#338838] transition-colors">
-              {featuredProduct.name}
-            </h3>
-
-            <p className="mb-4 text-gray-600 line-clamp-2 text-sm">
-              {featuredProduct.description}
-            </p>
-
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl font-bold text-[#338838]">
-                R$ {parseFloat(featuredProduct.price).toFixed(2)}
-              </span>
-            </div>
-
             <button
-              onClick={(e) => handleAddToCart(featuredProduct, e)}
-              className="bg-[#415444] hover:bg-[#415444]/90 text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg flex items-center gap-2"
+              onClick={(e) => handleAddToCart(saleProduct, e)}
+              className="w-full bg-[#415444] hover:bg-[#415444]/90 text-white py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2 font-medium"
             >
               <FaShoppingCart />
               Adicionar ao Carrinho
             </button>
           </div>
-
-          {/* Imagem do produto no canto */}
-          {featuredProduct.imageUrls?.[0] && (
-            <div className="absolute -right-4 -bottom-4 w-32 h-32 md:w-40 md:h-40 opacity-30 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none">
-              <img
-                src={featuredProduct.imageUrls[0]}
-                alt=""
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
         </div>
-      ) : (
-        // Fallback quando não há produto em destaque
-        <div className="bg-[#e0e5ce] border-0 rounded-[24px] p-6">
-          <p className="mb-2 text-sm font-medium uppercase text-[#338838]">
-            MELHORES OFERTAS
-          </p>
-          <h3 className="mb-4 text-2xl font-semibold">
-            Coleção de Produtos de Beleza
-          </h3>
-          <p className="mb-6 text-gray-600">
-            Descubra os melhores produtos segundo sua paixão
-          </p>
-          <button
-            onClick={() => navigate('/catalogo')}
-            className="bg-[#415444] hover:bg-[#415444]/90 text-white px-6 py-2 rounded-lg transition-colors"
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <div className="mb-12">
+        {/* Banner Produto em Promoção */}
+        {isLoadingSale ? (
+          <SaleSkeleton />
+        ) : saleProduct && saleProduct.salePrice ? (
+          <div
+            className="bg-[#e7ddd1] border-0 rounded-[24px] p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.01] group relative overflow-hidden"
+            onClick={handleOpenModal}
           >
-            Ver Mais
-          </button>
-        </div>
-      )}
-
-      {/* Banner Produto em Promoção */}
-      {isLoadingSale ? (
-        <SaleSkeleton />
-      ) : saleProduct && saleProduct.salePrice ? (
-        <div
-          className="bg-[#e7ddd1] border-0 rounded-[24px] p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group relative overflow-hidden"
-          onClick={() => handleProductClick(saleProduct.id)}
-        >
-          {/* Badge de promoção animado */}
-          <div className="absolute top-4 right-4 z-20">
-            <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
-              🔥 PROMOÇÃO
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex-1 relative z-10">
-              <h3 className="mb-2 text-xl md:text-2xl font-semibold text-gray-800 line-clamp-2 pr-20 group-hover:text-red-600 transition-colors">
-                {saleProduct.name}
-              </h3>
-
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-gray-500 line-through text-lg">
-                  R$ {parseFloat(saleProduct.price).toFixed(2)}
-                </span>
-                <span className="bg-red-500 text-white text-sm font-bold px-2 py-0.5 rounded">
-                  -{calculateDiscount(saleProduct.price, saleProduct.salePrice)}
-                  %
-                </span>
-              </div>
-
-              <p className="mb-4 text-4xl md:text-5xl font-bold text-red-600">
-                R$ {parseFloat(saleProduct.salePrice).toFixed(2)}
-              </p>
-
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm text-green-700 bg-green-100 px-2 py-1 rounded-full">
-                  💰 Economize R${' '}
-                  {(
-                    parseFloat(saleProduct.price) -
-                    parseFloat(saleProduct.salePrice)
-                  ).toFixed(2)}
-                </span>
-              </div>
-
-              <button
-                onClick={(e) => handleAddToCart(saleProduct, e)}
-                className="bg-[#415444] hover:bg-[#415444]/90 text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg flex items-center gap-2"
-              >
-                <FaShoppingCart />
-                Adicionar ao Carrinho
-              </button>
+            {/* Badge de promoção animado */}
+            <div className="absolute top-4 right-4 z-20">
+              <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+                🔥 PROMOÇÃO
+              </span>
             </div>
 
-            {/* Imagem do produto */}
-            {saleProduct.imageUrls?.[0] && (
-              <div className="hidden md:block relative">
-                <div className="w-36 h-36 lg:w-44 lg:h-44 rounded-2xl overflow-hidden shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                  <img
-                    src={saleProduct.imageUrls[0]}
-                    alt={saleProduct.name}
-                    className="w-full h-full object-cover"
-                  />
+            <div className="flex items-center justify-between">
+              <div className="flex-1 relative z-10">
+                <h3 className="mb-2 text-xl md:text-2xl font-semibold text-gray-800 line-clamp-2 pr-20 group-hover:text-red-600 transition-colors">
+                  {saleProduct.name}
+                </h3>
+
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-gray-500 line-through text-lg">
+                    R$ {parseFloat(saleProduct.price).toFixed(2)}
+                  </span>
+                  <span className="bg-red-500 text-white text-sm font-bold px-2 py-0.5 rounded">
+                    -
+                    {calculateDiscount(
+                      saleProduct.price,
+                      saleProduct.salePrice,
+                    )}
+                    %
+                  </span>
                 </div>
-                {/* Efeito de brilho */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                <p className="mb-4 text-4xl md:text-5xl font-bold text-red-600">
+                  R$ {parseFloat(saleProduct.salePrice).toFixed(2)}
+                </p>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-sm text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                    💰 Economize R${' '}
+                    {(
+                      parseFloat(saleProduct.price) -
+                      parseFloat(saleProduct.salePrice)
+                    ).toFixed(2)}
+                  </span>
+                </div>
+
+                <button className="bg-[#415444] hover:bg-[#415444]/90 text-white px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg flex items-center gap-2">
+                  <FaSearch />
+                  Ver Produto
+                </button>
               </div>
-            )}
+
+              {/* Imagem do produto */}
+              {saleProduct.imageUrls?.[0] && (
+                <div className="hidden md:block relative">
+                  <div className="w-36 h-36 lg:w-44 lg:h-44 rounded-2xl overflow-hidden shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                    <img
+                      src={saleProduct.imageUrls[0]}
+                      alt={saleProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* Efeito de brilho */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        // Fallback quando não há produto em promoção
-        <div className="bg-[#e7ddd1] border-0 rounded-[24px] p-6 flex items-center justify-between">
-          <div>
-            <h3 className="mb-4 text-3xl font-semibold">Promoção ✨</h3>
-            <p className="mb-2 text-gray-600">Em breve novidades incríveis!</p>
-            <p className="mb-6 text-2xl font-bold text-gray-800">
-              Fique de olho 👀
-            </p>
-            <button
-              onClick={() => navigate('/catalogo')}
-              className="bg-[#415444] hover:bg-[#415444]/90 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              Ver Catálogo
-            </button>
+        ) : (
+          // Fallback quando não há produto em promoção
+          <div className="bg-[#e7ddd1] border-0 rounded-[24px] p-6 flex items-center justify-between">
+            <div>
+              <h3 className="mb-4 text-3xl font-semibold">Promoção ✨</h3>
+              <p className="mb-2 text-gray-600">
+                Em breve novidades incríveis!
+              </p>
+              <p className="text-2xl font-bold text-gray-800">
+                Fique de olho 👀
+              </p>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && saleProduct && <ProductModal />}
+    </>
   );
 };
 
