@@ -70,27 +70,45 @@ const AdminPainel: React.FC = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeAllDropdowns = () => {
+    setIsUsersDropdownOpen(false);
+    setIsProductsDropdownOpen(false);
+    setIsCategoriesDropdownOpen(false);
+    setIsOrdersDropdownOpen(false);
+    setIsFinancialDropdownOpen(false);
+  };
+
   const toggleUsersDropdown = () => {
-    setIsUsersDropdownOpen(!isUsersDropdownOpen);
+    const isOpening = !isUsersDropdownOpen;
+    closeAllDropdowns();
+    setIsUsersDropdownOpen(isOpening);
     setActiveMenuItem('users');
   };
 
   const toggleProductsDropdown = () => {
-    setIsProductsDropdownOpen(!isProductsDropdownOpen);
+    const isOpening = !isProductsDropdownOpen;
+    closeAllDropdowns();
+    setIsProductsDropdownOpen(isOpening);
     setActiveMenuItem('products');
   };
 
   const toggleCategoriesDropdown = () => {
-    setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
+    const isOpening = !isCategoriesDropdownOpen;
+    closeAllDropdowns();
+    setIsCategoriesDropdownOpen(isOpening);
   };
 
   const toggleOrdersDropdown = () => {
-    setIsOrdersDropdownOpen(!isOrdersDropdownOpen);
+    const isOpening = !isOrdersDropdownOpen;
+    closeAllDropdowns();
+    setIsOrdersDropdownOpen(isOpening);
     setActiveMenuItem('orders');
   };
 
   const toggleFinancialDropdown = () => {
-    setIsFinancialDropdownOpen(!isFinancialDropdownOpen);
+    const isOpening = !isFinancialDropdownOpen;
+    closeAllDropdowns();
+    setIsFinancialDropdownOpen(isOpening);
     setActiveMenuItem('financial');
   };
 
