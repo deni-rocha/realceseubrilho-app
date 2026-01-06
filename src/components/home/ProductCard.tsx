@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa';
 import type { IProduct } from '../../types/catalog';
 
 interface ProductCardProps {
@@ -22,6 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const imageRef = useRef<HTMLDivElement>(null);
 
   const images =
@@ -31,7 +32,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Reset to first image when product changes
   useEffect(() => {
     setCurrentImageIndex(0);
+    setIsImageLoading(true);
   }, [product.id]);
+
+  // Reset loading state when image index changes
+  useEffect(() => {
+    setIsImageLoading(true);
+  }, [currentImageIndex]);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -102,12 +109,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Image */}
         {images.length > 0 ? (
-          <img
-            key={currentImageIndex}
-            src={images[currentImageIndex]}
-            alt={`${product.name} - Imagem ${currentImageIndex + 1}`}
-            className="h-[280px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105"
-          />
+          <div className="relative h-[280px] w-full">
+            {/* Spinner de carregamento */}
+            {isImageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 z-5">
+                <FaSpinner className="w-8 h-8 text-green-600 animate-spin" />
+              </div>
+            )}
+            <img
+              key={currentImageIndex}
+              src={images[currentImageIndex]}
+              alt={`${product.name} - Imagem ${currentImageIndex + 1}`}
+              className={`h-[280px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                isImageLoading ? 'invisible' : 'visible'
+              }`}
+              onLoad={() => setIsImageLoading(false)}
+              onError={() => setIsImageLoading(false)}
+            />
+          </div>
         ) : (
           <div className="h-[280px] w-full bg-gray-300 flex items-center justify-center">
             <span className="text-gray-500">Sem imagem</span>
