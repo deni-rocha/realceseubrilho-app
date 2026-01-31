@@ -133,23 +133,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Navigation Arrows - Only show if multiple images */}
+        {/* Navigation Arrows - Show conditionally based on available navigation */}
         {hasMultipleImages && (
           <>
-            <button
-              onClick={handlePrevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 z-30"
-              aria-label="Imagem anterior"
-            >
-              <FaChevronLeft className="h-4 w-4 text-gray-800" />
-            </button>
-            <button
-              onClick={handleNextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 z-30"
-              aria-label="Próxima imagem"
-            >
-              <FaChevronRight className="h-4 w-4 text-gray-800" />
-            </button>
+            {/* Previous arrow - show if not at first image */}
+            {currentImageIndex > 0 && (
+              <button
+                onClick={handlePrevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all z-30"
+                aria-label="Imagem anterior"
+              >
+                <FaChevronLeft className="h-4 w-4 text-gray-800" />
+              </button>
+            )}
+            
+            {/* Next arrow - show if not at last image */}
+            {currentImageIndex < images.length - 1 && (
+              <button
+                onClick={handleNextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all z-30"
+                aria-label="Próxima imagem"
+              >
+                <FaChevronRight className="h-4 w-4 text-gray-800" />
+              </button>
+            )}
           </>
         )}
 
