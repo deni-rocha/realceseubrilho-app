@@ -38,7 +38,7 @@ const CategoryList: React.FC = () => {
   const handleDelete = async (categoryId: string) => {
     if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
       try {
-        await api.delete(`/categories/${categoryId}`);
+        await api.delete(`/product-category/${categoryId}`);
         toast.success('Categoria excluída com sucesso!');
         refetch();
       } catch (error: any) {
