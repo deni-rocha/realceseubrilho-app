@@ -112,8 +112,11 @@ const ExpenseList = ({ onEdit, onAdd }: ExpenseListProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <FaSpinner className="animate-spin text-4xl text-gray-400" />
+      <div className="p-6 text-gray-700 dark:text-gray-300 flex items-center justify-center min-h-[200px]">
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+          <span>Carregando despesas...</span>
+        </div>
       </div>
     );
   }

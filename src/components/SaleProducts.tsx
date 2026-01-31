@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { FaSpinner } from 'react-icons/fa';
 import api from '../api';
 import type { ResponseCreateProduct } from '../types/createProduct.ts/ResponseCreateProduct';
 
@@ -28,9 +29,10 @@ const SaleProducts: React.FC<SaleProductsProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`${className}`}>
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      <div className={`${className} flex items-center justify-center py-12`}>
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-red-600 animate-spin mb-2" />
+          <span>Carregando produtos em promoção...</span>
         </div>
       </div>
     );

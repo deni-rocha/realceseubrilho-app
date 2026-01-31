@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../api';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaSpinner } from 'react-icons/fa';
 import { LuRefreshCw } from 'react-icons/lu';
 import { IoMdClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
@@ -51,8 +51,11 @@ const CategoryList: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6 text-gray-700 dark:text-gray-300">
-        Carregando categorias...
+      <div className="p-6 text-gray-700 dark:text-gray-300 flex items-center justify-center min-h-[200px]">
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+          <span>Carregando categorias...</span>
+        </div>
       </div>
     );
   }

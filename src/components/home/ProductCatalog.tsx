@@ -6,6 +6,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaExpand,
+  FaSpinner,
 } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 import publicApi from '../../api/publicApi';
@@ -347,11 +348,9 @@ const ProductCatalog: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-          <div className="text-xl text-gray-700 dark:text-gray-300">
-            Carregando produtos...
-          </div>
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+          <span className="text-xl text-gray-700 dark:text-gray-300">Carregando produtos...</span>
         </div>
       </div>
     );

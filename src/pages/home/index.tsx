@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { FaSpinner } from 'react-icons/fa';
 import publicApi from '../../api/publicApi';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
@@ -238,7 +239,10 @@ const Home: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#fcfdfd]">
-        <div className="text-xl text-gray-700">Carregando produtos...</div>
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+          <span className="text-xl text-gray-700">Carregando produtos...</span>
+        </div>
       </div>
     );
   }

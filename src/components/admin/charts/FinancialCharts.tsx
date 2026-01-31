@@ -321,8 +321,11 @@ const FinancialCharts = () => {
   const renderChart = () => {
     if (isLoading) {
       return (
-        <div className="flex items-center justify-center h-96">
-          <FaSpinner className="animate-spin text-4xl text-gray-400" />
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-white dark:bg-gray-900">
+          <div className="flex flex-col items-center">
+            <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+            <span className="text-gray-700 dark:text-gray-300">Carregando gráficos financeiros...</span>
+          </div>
         </div>
       );
     }

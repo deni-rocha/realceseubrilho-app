@@ -5,7 +5,7 @@ import fetchUsers from '../../api/fetchUsers';
 import UserCard from './UserCard';
 import UserCardDetails from './UserCardDetails';
 import { IoChevronBack } from 'react-icons/io5';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaSpinner } from 'react-icons/fa';
 import { LuRefreshCw } from 'react-icons/lu';
 import { IoMdClose } from 'react-icons/io';
 
@@ -47,7 +47,14 @@ const UserList: React.FC = () => {
   }, [users, searchTerm, filterBy]);
 
   if (isLoading) {
-    return <div>Carregando usuários...</div>;
+    return (
+      <div className="p-6 text-gray-700 dark:text-gray-300 flex items-center justify-center min-h-[200px]">
+        <div className="flex flex-col items-center">
+          <FaSpinner className="w-8 h-8 text-green-600 animate-spin mb-2" />
+          <span>Carregando usuários...</span>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
