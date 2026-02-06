@@ -393,7 +393,7 @@ const Home: React.FC = () => {
 
       {/* Desktop Cart Sidebar */}
       {isCartVisible && (
-        <aside className="w-80 lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
+          <aside className="w-80 h-screen lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
           <div className="mb-8 flex items-center justify-between">
             <h3 className="text-2xl font-semibold">Meu Carrinho</h3>
           </div>
