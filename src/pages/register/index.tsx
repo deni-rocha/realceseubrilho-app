@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   FaArrowRight,
+  FaCheckCircle,
   FaEnvelope,
   FaEye,
   FaEyeSlash,
@@ -14,6 +15,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import type { User } from '../../types/User';
+
+interface RegisterResponse {
+  user: User;
+  access_token: string;
+  message: string;
+}
+
 import api from '../../api';
 import type { ApiError } from '../../types/ApiError';
 
@@ -40,6 +48,8 @@ type FormData = z.infer<typeof formSchema>;
 const FormUser: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   // 2. Gerenciamento do Formulário com useForm e zodResolver
@@ -64,9 +74,14 @@ const FormUser: React.FC = () => {
         password: data.password,
       };
 
-      await api.post<User>('/auth/register', userToRegister);
-
-      toast.success('Usuário cadastrado com sucesso!');
+      const response = await api.post<RegisterResponse>('/auth/register', userToRegister);
+            
+      // Armazenar a mensagem de sucesso do backend
+      const message = response.data.message || 'Conta criada com sucesso! Por favor, confirme seu e-mail para ativar sua conta.';
+      setSuccessMessage(message);
+            
+      // Mostrar modal de sucesso em vez de toast
+      setShowSuccessModal(true);
     } catch (err) {
       if ((err as ApiError).status === 409) {
         toast.error('Email já cadastrado. Tente outro email.');
@@ -101,7 +116,7 @@ const FormUser: React.FC = () => {
       </button>
       <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
         
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className={showSuccessModal ? 'hidden' : ''}>
           <div className="space-y-6 mb-8">
             {/* Campo Nome */}
             <div className="relative">
@@ -226,6 +241,24 @@ const FormUser: React.FC = () => {
             </button>
           </div>
         </form>
+
+        {/* Modal de sucesso após registro */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 ">
+            <div className="bg-white p-10 rounded-lg shadow-lg text-center w-full max-w-md">
+              <div className="flex flex-col items-center text-green-600">
+                <FaCheckCircle className="text-6xl mb-4" />
+                <h1 className="text-2xl font-bold">Cadastro Concluído!</h1>
+                <p className="mt-2 text-gray-600">
+                  {successMessage}
+                </p>
+                <Link to="/login" className="mt-4 text-blue-500 hover:underline">
+                  Ir para a página de login
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="text-center text-sm">
           <span className="text-gray-600 dark:text-gray-200">
