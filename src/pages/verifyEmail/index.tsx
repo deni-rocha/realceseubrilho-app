@@ -28,11 +28,11 @@ const VerifyEmail: React.FC = () => {
       try {
         const response = await api.post('/auth/verify-email', { token });
 
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 201) {
           setStatus('success');
           setMessage('Seu e-mail foi verificado com sucesso!');
         } else {
-          // Trata outros status de sucesso que não sejam 200, se necessário
+          // Trata outros status de sucesso que não sejam 200 ou 201
           setStatus('error');
           setMessage('Ocorreu um erro inesperado durante a verificação.');
         }
