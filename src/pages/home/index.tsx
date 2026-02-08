@@ -24,6 +24,7 @@ import BottomNavigationBar from '../../components/home/BottomNavigationBar';
 import ProfileBar from '../../components/home/ProfileBar';
 import MobileSearchBar from '../../components/home/MobileSearchBar';
 import Toast from '../../components/home/Toast';
+import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
   // Filter State
@@ -62,6 +63,7 @@ const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { logout } = useAuthStore();
   const user = useAuthStore((state: any) => state.user);
+  const navigate = useNavigate();
 
   // Fetch products
   const {
@@ -393,7 +395,7 @@ const Home: React.FC = () => {
 
       {/* Desktop Cart Sidebar */}
       {isCartVisible && (
-          <aside className="w-80 h-screen lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
+        <aside className="w-80 h-screen lg:w-96 border-l border-gray-200 px-6 py-8 flex-col overflow-y-auto hidden xl:flex">
           <div className="mb-8 flex items-center justify-between">
             <h3 className="text-2xl font-semibold">Meu Carrinho</h3>
           </div>
@@ -413,7 +415,7 @@ const Home: React.FC = () => {
         isOpen={isCartOpen}
         onClose={() => {
           setIsCartOpen(false);
-          setMobileActiveTab('home');
+          navigate('/');
         }}
         cartItems={cartItems}
         cartTotal={cartTotal}
