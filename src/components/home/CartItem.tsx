@@ -54,7 +54,7 @@ const CartItem: React.FC<CartItemProps> = ({
           </div>
           <button
             onClick={() => onRemove(item.id)}
-            className="h-8 w-8 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+            className="border-2 border-gray-300 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
             aria-label={`Remover ${item.name}`}
           >
             <FaTimes className="h-4 w-4 text-gray-500" />

@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useCart } from '../../hooks/useCart';
 import { createGuestOrder } from '../../api/orders';
 import type { IProduct, GuestCheckoutData } from '../../types/catalog';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import reusable components
 import Sidebar from '../../components/home/Sidebar';
@@ -18,7 +19,6 @@ import AdvancedFilter, {
 import ActiveFilterBadges from '../../components/home/ActiveFilterBadges';
 import ProductCard from '../../components/home/ProductCard';
 import CartContent from '../../components/home/CartContent';
-import CartDrawer from '../../components/home/CartDrawer';
 import GuestCheckoutModal from '../../components/home/GuestCheckoutModal';
 import BottomNavigationBar from '../../components/home/BottomNavigationBar';
 import ProfileBar from '../../components/home/ProfileBar';
@@ -36,6 +36,7 @@ const Home: React.FC = () => {
   // UI State
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const location = useLocation();
   const [mobileActiveTab, setMobileActiveTab] = useState<
     'home' | 'search' | 'cart' | 'profile'
   >('home');
@@ -117,6 +118,13 @@ const Home: React.FC = () => {
       setPriceRange({ min: 0, max: maxPrice });
     }
   }, [products, maxPrice]);
+
+  // Update mobile active tab based on current route
+  useEffect(() => {
+    if (location.pathname === '/cart') {
+      setMobileActiveTab('cart');
+    }
+  }, [location.pathname]);
 
   // Extract categories from products
   const categories = useMemo(() => {
@@ -223,16 +231,17 @@ const Home: React.FC = () => {
   }, []);
 
   // Mobile tab handler
+  const navigate = useNavigate();
+
   const handleMobileTabChange = useCallback(
     (tab: 'home' | 'search' | 'cart' | 'profile') => {
-      setMobileActiveTab(tab);
       if (tab === 'cart') {
-        setIsCartOpen(true);
+        navigate('/cart');
       } else {
-        setIsCartOpen(false);
+        setMobileActiveTab(tab);
       }
     },
-    [setIsCartOpen],
+    [navigate],
   );
 
   // Loading state
@@ -269,124 +278,131 @@ const Home: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 px-4 md:px-8 py-8 overflow-y-auto pb-20 lg:pb-8 lg:ml-64">
-        {/* Mobile Profile Bar - Only show when profile tab is active */}
-        {mobileActiveTab === 'profile' && (
-          <ProfileBar
-            isAuthenticated={isAuthenticated}
-            userName={user?.name}
-            userEmail={user?.email}
-            onLogout={logout}
-          />
-        )}
-
-        {/* Mobile Search Bar - Only show when search tab is active */}
-        {mobileActiveTab === 'search' && (
-          <MobileSearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onClose={() => setMobileActiveTab('home')}
-            onClear={() => setSearchTerm('')}
-          />
-        )}
-
-        {/* Header - Desktop only */}
-        <div className="hidden lg:block">
-          <Header
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            userName={user?.name || 'Cliente'}
-          />
-        </div>
-
-        {/* Main Content - Hide when profile tab is active on mobile */}
-        {(mobileActiveTab === 'home' ||
-          mobileActiveTab === 'search' ||
-          window.innerWidth >= 1024) && (
+        {/* Show content only if not on cart page */}
+        {location.pathname !== '/cart' && (
           <>
-            {/* Banner Cards - Hide when searching on mobile only */}
-            {((!searchTerm && mobileActiveTab !== 'search') ||
-              window.innerWidth >= 1024) && <BannerCards />}
+            {/* Mobile Profile Bar - Only show when profile tab is active */}
+            {mobileActiveTab === 'profile' && (
+              <ProfileBar
+                isAuthenticated={isAuthenticated}
+                userName={user?.name}
+                userEmail={user?.email}
+                onLogout={logout}
+              />
+            )}
 
-            {/* Advanced Filter and Products Layout */}
-            <div className="flex flex-col lg:flex-row gap-6 mt-8">
-              {/* Filter Sidebar */}
-              <div className="w-full lg:w-64 lg:flex-shrink-0">
-                <div className="lg:sticky lg:top-4">
-                  <AdvancedFilter
-                    categories={categories}
-                    selectedCategories={selectedCategories}
-                    onCategoriesChange={setSelectedCategories}
-                    priceRange={priceRange}
-                    onPriceRangeChange={setPriceRange}
-                    sortBy={sortBy}
-                    onSortChange={setSortBy}
-                    inStockOnly={inStockOnly}
-                    onInStockChange={setInStockOnly}
-                    onClearFilters={handleClearFilters}
-                    productCount={filteredProducts.length}
-                    maxPrice={maxPrice}
-                    isOpen={isFilterOpen}
-                    onOpenChange={setIsFilterOpen}
-                  />
-                </div>
-              </div>
+            {/* Mobile Search Bar - Only show when search tab is active */}
+            {mobileActiveTab === 'search' && (
+              <MobileSearchBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onClose={() => setMobileActiveTab('home')}
+                onClear={() => setSearchTerm('')}
+              />
+            )}
 
-              {/* Products Section */}
-              <div className="flex-1 min-w-0">
-                {/* Active Filter Badges */}
-                <ActiveFilterBadges
-                  selectedCategories={selectedCategories}
-                  priceRange={priceRange}
-                  sortBy={sortBy}
-                  inStockOnly={inStockOnly}
-                  maxPrice={maxPrice}
-                  onRemoveCategory={handleRemoveCategory}
-                  onRemovePriceFilter={handleRemovePriceFilter}
-                  onRemoveSortFilter={handleRemoveSortFilter}
-                  onRemoveStockFilter={handleRemoveStockFilter}
-                  onClearAll={handleClearFilters}
-                />
-
-                {/* Section Header */}
-                <div className="mb-6 flex items-center justify-between">
-                  <h3 className="text-2xl font-semibold">
-                    {selectedCategories.length > 0
-                      ? selectedCategories.join(', ')
-                      : 'Todos os Produtos'}
-                  </h3>
-                  <span className="text-sm text-gray-600">
-                    {filteredProducts.length}{' '}
-                    {filteredProducts.length === 1 ? 'produto' : 'produtos'}
-                  </span>
-                </div>
-
-                {/* Products Grid */}
-                {filteredProducts.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <p className="text-lg mb-2">Nenhum produto encontrado.</p>
-                    <button
-                      onClick={handleClearFilters}
-                      className="text-[#338838] hover:underline text-sm font-medium"
-                    >
-                      Limpar filtros
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
-                    {filteredProducts.map((product: IProduct) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        isHovered={hoveredProduct === product.id}
-                        onMouseEnter={() => setHoveredProduct(product.id)}
-                        onMouseLeave={() => setHoveredProduct(null)}
-                        onAddToCart={() => addToCart(product)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+            {/* Header - Desktop only */}
+            <div className="hidden lg:block">
+              <Header
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                userName={user?.name || 'Cliente'}
+              />
             </div>
+
+            {/* Main Content - Hide when profile tab is active on mobile */}
+            {(mobileActiveTab === 'home' ||
+              mobileActiveTab === 'search' ||
+              window.innerWidth >= 1024) && (
+              <>
+                {/* Banner Cards - Hide when searching on mobile only */}
+                {((!searchTerm && mobileActiveTab !== 'search') ||
+                  window.innerWidth >= 1024) && <BannerCards />}
+
+                {/* Advanced Filter and Products Layout */}
+                <div className="flex flex-col lg:flex-row gap-6 mt-8">
+                  {/* Filter Sidebar */}
+                  <div className="w-full lg:w-64 lg:flex-shrink-0">
+                    <div className="lg:sticky lg:top-4">
+                      <AdvancedFilter
+                        categories={categories}
+                        selectedCategories={selectedCategories}
+                        onCategoriesChange={setSelectedCategories}
+                        priceRange={priceRange}
+                        onPriceRangeChange={setPriceRange}
+                        sortBy={sortBy}
+                        onSortChange={setSortBy}
+                        inStockOnly={inStockOnly}
+                        onInStockChange={setInStockOnly}
+                        onClearFilters={handleClearFilters}
+                        productCount={filteredProducts.length}
+                        maxPrice={maxPrice}
+                        isOpen={isFilterOpen}
+                        onOpenChange={setIsFilterOpen}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Products Section */}
+                  <div className="flex-1 min-w-0">
+                    {/* Active Filter Badges */}
+                    <ActiveFilterBadges
+                      selectedCategories={selectedCategories}
+                      priceRange={priceRange}
+                      sortBy={sortBy}
+                      inStockOnly={inStockOnly}
+                      maxPrice={maxPrice}
+                      onRemoveCategory={handleRemoveCategory}
+                      onRemovePriceFilter={handleRemovePriceFilter}
+                      onRemoveSortFilter={handleRemoveSortFilter}
+                      onRemoveStockFilter={handleRemoveStockFilter}
+                      onClearAll={handleClearFilters}
+                    />
+
+                    {/* Section Header */}
+                    <div className="mb-6 flex items-center justify-between">
+                      <h3 className="text-2xl font-semibold">
+                        {selectedCategories.length > 0
+                          ? selectedCategories.join(', ')
+                          : 'Todos os Produtos'}
+                      </h3>
+                      <span className="text-sm text-gray-600">
+                        {filteredProducts.length}{' '}
+                        {filteredProducts.length === 1 ? 'produto' : 'produtos'}
+                      </span>
+                    </div>
+
+                    {/* Products Grid */}
+                    {filteredProducts.length === 0 ? (
+                      <div className="text-center py-12 text-gray-500">
+                        <p className="text-lg mb-2">
+                          Nenhum produto encontrado.
+                        </p>
+                        <button
+                          onClick={handleClearFilters}
+                          className="text-[#338838] hover:underline text-sm font-medium"
+                        >
+                          Limpar filtros
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+                        {filteredProducts.map((product: IProduct) => (
+                          <ProductCard
+                            key={product.id}
+                            product={product}
+                            isHovered={hoveredProduct === product.id}
+                            onMouseEnter={() => setHoveredProduct(product.id)}
+                            onMouseLeave={() => setHoveredProduct(null)}
+                            onAddToCart={() => addToCart(product)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </main>
@@ -408,28 +424,13 @@ const Home: React.FC = () => {
         </aside>
       )}
 
-      {/* Mobile Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => {
-          setIsCartOpen(false);
-          setMobileActiveTab('profile');
-        }}
-        cartItems={cartItems}
-        cartTotal={cartTotal}
-        onUpdateQuantity={updateQuantity}
-        onRemove={removeFromCart}
-        onCheckout={handleCheckout}
-        isCheckoutDisabled={cartItems.length === 0}
-      />
-
-      {/* Mobile Bottom Navigation - Hide when filter is open */}
+      {/* Mobile Bottom Navigation - Hide when filter is open or on cart page */}
       <BottomNavigationBar
         activeTab={mobileActiveTab}
         cartItemsCount={cartItemsCount}
         onTabChange={handleMobileTabChange}
         onClearSearch={() => setSearchTerm('')}
-        isHidden={isFilterOpen}
+        isHidden={isFilterOpen || location.pathname === '/cart'}
       />
 
       {/* Guest Checkout Modal */}

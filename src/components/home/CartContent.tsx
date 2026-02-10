@@ -32,8 +32,8 @@ const CartContent: React.FC<CartContentProps> = ({
   }
 
   return (
-    <>
-      <div className="space-y-6 flex-grow overflow-auto">
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="space-y-6 flex-grow overflow-auto pb-32">
         {cartItems.map((item) => (
           <CartItem
             key={item.id}
@@ -44,20 +44,10 @@ const CartContent: React.FC<CartContentProps> = ({
         ))}
       </div>
 
-      <div className="mt-8 space-y-4 border-t pt-6">
-        <div className="flex items-center justify-between text-base">
-          <p className="text-gray-600">Subtotal</p>
-          <p className="font-semibold">R$ {cartTotal.toFixed(2)}</p>
-        </div>
-        <div className="flex items-center justify-between text-base">
-          <p className="text-gray-600">Frete</p>
-          <p className="text-[#338838] font-semibold">GRÁTIS</p>
-        </div>
-        <div className="border-t pt-4">
-          <div className="flex items-center justify-between text-lg font-semibold">
-            <p>Total</p>
-            <p>R$ {cartTotal.toFixed(2)}</p>
-          </div>
+      <div className="mt-8 space-y-4 border-t pt-6 bg-white z-10 fixed bottom-0 left-0 right-0 max-w-md mx-auto w-full px-6 py-4 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:top-auto">
+        <div className="flex items-center justify-between text-lg font-semibold">
+          <p>Total</p>
+          <p>R$ {cartTotal.toFixed(2)}</p>
         </div>
         <button
           onClick={onCheckout}
@@ -69,7 +59,7 @@ const CartContent: React.FC<CartContentProps> = ({
           Finalizar Compra
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

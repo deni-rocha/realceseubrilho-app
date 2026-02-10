@@ -17,6 +17,7 @@ import FinancialCharts from './components/admin/charts/FinancialCharts';
 import DashboardWithCharts from './components/admin/DashboardWithCharts';
 import RequestResetPassword from './pages/resetPassword/request';
 import ResetPasswordForm from './pages/resetPassword';
+import CartPage from './pages/cart';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -57,6 +58,7 @@ function App() {
               element={<DashboardWithCharts />}
             />
             <Route path="/home" element={<Home />} />
+            <Route path="/cart" element={<CartPage />} />
             <Route path="/customer" element={<CustomerProfile />} />
             <Route path="*" element={<NotFound />} />
             <Route path="register-user" element={<RegisterUser />} />
