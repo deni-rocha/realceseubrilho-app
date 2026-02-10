@@ -51,8 +51,6 @@ const Home: React.FC = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    isCartOpen,
-    setIsCartOpen,
     isCartVisible,
     setIsCartVisible,
     toast,
@@ -90,7 +88,6 @@ const Home: React.FC = () => {
       // Limpar carrinho
       clearCart();
       setIsCheckoutModalOpen(false);
-      setIsCartOpen(false);
 
       // Redirecionar para WhatsApp
       window.location.href = data.whatsappUrl;

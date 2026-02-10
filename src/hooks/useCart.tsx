@@ -33,9 +33,7 @@ interface CartContextType {
   updateQuantity: (itemId: string, change: number) => void;
   clearCart: () => void;
 
-  // Estado do drawer/modal do carrinho
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
+  // Estado do carrinho
   isCartVisible: boolean;
   setIsCartVisible: (visible: boolean) => void;
 
@@ -60,8 +58,8 @@ const CART_STORAGE_KEY = 'cart_items';
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Obter estado de autenticação
   const { isAuthenticated } = useAuth();
-  const user = useAuthStore(state => state.user);
-  
+  const user = useAuthStore((state) => state.user);
+
   // Estado do carrinho
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     // Carregar do localStorage apenas se não estiver autenticado
@@ -71,8 +69,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
     return [];
   });
-  
-  const [isCartOpen, setIsCartOpen] = useState(false);
+
   const [isCartVisible, setIsCartVisible] = useState(true);
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -95,12 +92,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const loadCartFromBackend = async (userId: string) => {
     try {
       const cart = await cartApi.findOrCreateCart(userId);
-      const backendCartItems: CartItem[] = cart.cartItems.map(item => ({
+      const backendCartItems: CartItem[] = cart.cartItems.map((item) => ({
         ...item.product,
         quantity: item.quantity,
         selectedSize: 'M', // Valor padrão, pode ser ajustado conforme necessário
       }));
-      
+
       setCartItems(backendCartItems);
     } catch (error) {
       console.error('Erro ao carregar carrinho do backend:', error);
@@ -139,8 +136,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       // Atualizar/remover itens existentes
       for (const cartItem of cart.cartItems) {
-        const localItem = cartItems.find(item => item.id === cartItem.product.id);
-        
+        const localItem = cartItems.find(
+          (item) => item.id === cartItem.product.id,
+        );
+
         if (!localItem) {
           // Item foi removido localmente, remover do backend
           await cartApi.removeProduct(cartId, cartItem.product.id);
@@ -156,8 +155,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       // Adicionar novos itens
       for (const localItem of cartItems) {
-        const backendItem = cart.cartItems.find(item => item.product.id === localItem.id);
-        
+        const backendItem = cart.cartItems.find(
+          (item) => item.product.id === localItem.id,
+        );
+
         if (!backendItem) {
           // Novo item, adicionar ao backend
           await cartApi.addProduct(cartId, {
@@ -220,7 +221,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
               : cartItem,
           );
-          
+
           return updatedItems;
         }
 
@@ -241,7 +242,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             selectedSize: 'M',
           } as CartItem,
         ];
-        
+
         return newItems;
       });
     },
@@ -310,8 +311,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    isCartOpen,
-    setIsCartOpen,
     isCartVisible,
     setIsCartVisible,
     toast,
