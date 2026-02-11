@@ -29,7 +29,6 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   // Handle search tab click - navigate to search page
   const handleSearchClick = () => {
-    onTabChange('search');
     navigate('/search');
   };
 

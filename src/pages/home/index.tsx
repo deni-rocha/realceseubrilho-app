@@ -21,7 +21,6 @@ import ProductCard from '../../components/home/ProductCard';
 import CartContent from '../../components/home/CartContent';
 import GuestCheckoutModal from '../../components/home/GuestCheckoutModal';
 import BottomNavigationBar from '../../components/home/BottomNavigationBar';
-import MobileSearchBar from '../../components/home/MobileSearchBar';
 import Toast from '../../components/home/Toast';
 
 // Custom hook for debouncing
@@ -304,16 +303,6 @@ const Home: React.FC = () => {
                   Redirecionando para o perfil...
                 </p>
               </div>
-            )}
-
-            {/* Mobile Search Bar - Only show when search tab is active */}
-            {mobileActiveTab === 'search' && (
-              <MobileSearchBar
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                onClose={() => setMobileActiveTab('home')}
-                onClear={() => setSearchTerm('')}
-              />
             )}
 
             {/* Header - Desktop only */}
