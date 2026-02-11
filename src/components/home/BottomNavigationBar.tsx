@@ -24,7 +24,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     onTabChange('home');
 
     setTimeout(() => {
-      // Add any additional logic here if needed
+      // para resolver bug da primeira imagem não atualizar no mobile
       onTabChange('home');
     }, 100);
 
