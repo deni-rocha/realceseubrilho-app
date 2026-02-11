@@ -18,8 +18,8 @@ type SupportWidgetProps = {
   availableHours?: string;
 };
 
-const DEFAULT_WHATSAPP_NUMBER = '5585999999999'; // Substitua pelo número oficial
-const DEFAULT_SUPPORT_EMAIL = 'suporte@realceseubrilho.com';
+const DEFAULT_WHATSAPP_NUMBER = '5581986527493';
+const DEFAULT_SUPPORT_EMAIL = 'frevolink@gmail.com';
 const DEFAULT_BUSINESS_NAME = 'Realce Seu Brilho';
 const DEFAULT_AVAILABLE_HOURS = 'Seg - Sex, 09:00 às 18:00';
 
