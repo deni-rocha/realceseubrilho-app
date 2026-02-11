@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   FaHome,
   FaUser,
-  FaCog,
-  FaEnvelope,
   FaShoppingCart,
   FaHeadset,
   FaSignOutAlt,
@@ -59,18 +57,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Profile/Login Section - Always visible in desktop mode */}
         <Link
           to={isAuthenticated ? '/customer' : '/login'}
-          className={`flex items-center gap-3 px-3 py-2 transition-colors ${
+          className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
             (isAuthenticated && isActive('/customer')) ||
             (!isAuthenticated && isActive('/login'))
               ? 'text-[#415444] font-semibold'
               : 'text-gray-500 hover:text-gray-900'
           }`}
         >
+          {isActive('/customer') && (
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
+          )}
           <FaUser className="h-5 w-5" />
           {isAuthenticated ? 'Perfil' : 'Entrar'}
         </Link>
 
-        {isAuthenticated && (
+        {/*{isAuthenticated && (
           <>
             <button
               type="button"
@@ -87,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               Mensagens
             </button>
           </>
-        )}
+        )}*/}
         <button
           type="button"
           onClick={onToggleCart}

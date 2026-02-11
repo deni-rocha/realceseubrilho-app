@@ -159,7 +159,7 @@ Obrigado(a)!`,
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors md:hidden"
             aria-label="Voltar à página anterior"
           >
             <svg
