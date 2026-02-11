@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaHome, FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 
 interface BottomNavigationBarProps {
@@ -16,6 +17,8 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onClearSearch,
   isHidden = false, // Default to false (visible)
 }) => {
+  const navigate = useNavigate();
+
   // Handle home tab click with search clearing
   const handleHomeClick = () => {
     onTabChange('home');
@@ -24,8 +27,16 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     }
   };
 
+  // Handle profile tab click - navigate to profile page
+  const handleProfileClick = () => {
+    onTabChange('profile');
+    navigate('/profile');
+  };
+
   return (
-    <div className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out ${isHidden ? 'translate-y-full' : 'translate-y-0'}`}>
+    <div
+      className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out ${isHidden ? 'translate-y-full' : 'translate-y-0'}`}
+    >
       <div className="flex items-center justify-around h-16">
         {/* Home */}
         <button
@@ -87,7 +98,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
         {/* Profile */}
         <button
-          onClick={() => onTabChange('profile')}
+          onClick={handleProfileClick}
           className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'profile'
               ? 'text-[#415444]'

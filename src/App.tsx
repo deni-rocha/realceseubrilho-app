@@ -12,7 +12,8 @@ import VerifyEmail from './pages/verifyEmail';
 import RequestEmailVerification from './pages/requestEmailVerification';
 import Home from './pages/home';
 import SupportWidget from './components/SupportWidget.tsx';
-import CustomerProfile from './pages/customer';
+import ProfilePage from './pages/profileMobile/index.tsx';
+import CustomerPage from './pages/customer';
 import FinancialCharts from './components/admin/charts/FinancialCharts';
 import DashboardWithCharts from './components/admin/DashboardWithCharts';
 import RequestResetPassword from './pages/resetPassword/request';
@@ -59,7 +60,8 @@ function App() {
             />
             <Route path="/home" element={<Home />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/customer" element={<CustomerProfile />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/customer" element={<CustomerPage />} />
             <Route path="*" element={<NotFound />} />
             <Route path="register-user" element={<RegisterUser />} />
             <Route path="verify-email" element={<VerifyEmail />} />

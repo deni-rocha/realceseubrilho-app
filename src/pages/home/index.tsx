@@ -21,7 +21,6 @@ import ProductCard from '../../components/home/ProductCard';
 import CartContent from '../../components/home/CartContent';
 import GuestCheckoutModal from '../../components/home/GuestCheckoutModal';
 import BottomNavigationBar from '../../components/home/BottomNavigationBar';
-import ProfileBar from '../../components/home/ProfileBar';
 import MobileSearchBar from '../../components/home/MobileSearchBar';
 import Toast from '../../components/home/Toast';
 
@@ -280,12 +279,11 @@ const Home: React.FC = () => {
           <>
             {/* Mobile Profile Bar - Only show when profile tab is active */}
             {mobileActiveTab === 'profile' && (
-              <ProfileBar
-                isAuthenticated={isAuthenticated}
-                userName={user?.name}
-                userEmail={user?.email}
-                onLogout={logout}
-              />
+              <div className="p-4">
+                <p className="text-center text-gray-600">
+                  Redirecionando para o perfil...
+                </p>
+              </div>
             )}
 
             {/* Mobile Search Bar - Only show when search tab is active */}

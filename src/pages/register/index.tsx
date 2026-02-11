@@ -74,12 +74,17 @@ const FormUser: React.FC = () => {
         password: data.password,
       };
 
-      const response = await api.post<RegisterResponse>('/auth/register', userToRegister);
-            
+      const response = await api.post<RegisterResponse>(
+        '/auth/register',
+        userToRegister,
+      );
+
       // Armazenar a mensagem de sucesso do backend
-      const message = response.data.message || 'Conta criada com sucesso! Por favor, confirme seu e-mail para ativar sua conta.';
+      const message =
+        response.data.message ||
+        'Conta criada com sucesso! Por favor, confirme seu e-mail para ativar sua conta.';
       setSuccessMessage(message);
-            
+
       // Mostrar modal de sucesso em vez de toast
       setShowSuccessModal(true);
     } catch (err) {
@@ -114,9 +119,12 @@ const FormUser: React.FC = () => {
         </svg>
         Voltar
       </button>
+
       <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-accent-dark rounded-lg shadow-lg">
-        
-        <form onSubmit={handleSubmit(onSubmit)} className={showSuccessModal ? 'hidden' : ''}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className={showSuccessModal ? 'hidden' : ''}
+        >
           <div className="space-y-6 mb-8">
             {/* Campo Nome */}
             <div className="relative">
@@ -249,10 +257,11 @@ const FormUser: React.FC = () => {
               <div className="flex flex-col items-center text-green-600">
                 <FaCheckCircle className="text-6xl mb-4" />
                 <h1 className="text-2xl font-bold">Cadastro Concluído!</h1>
-                <p className="mt-2 text-gray-600">
-                  {successMessage}
-                </p>
-                <Link to="/login" className="mt-4 text-blue-500 hover:underline">
+                <p className="mt-2 text-gray-600">{successMessage}</p>
+                <Link
+                  to="/login"
+                  className="mt-4 text-blue-500 hover:underline"
+                >
                   Ir para a página de login
                 </Link>
               </div>

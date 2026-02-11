@@ -33,7 +33,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <aside className="fixed w-64 border-r border-gray-200 px-6 py-8 hidden lg:block h-screen overflow-y-auto" style={{ top: 0, left: 0 }}>
+    <aside
+      className="fixed w-64 border-r border-gray-200 px-6 py-8 hidden lg:block h-screen overflow-y-auto"
+      style={{ top: 0, left: 0 }}
+    >
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#415444]">Realce Seu Brilho</h1>
       </div>
@@ -52,23 +55,21 @@ const Sidebar: React.FC<SidebarProps> = ({
           <FaHome className="h-5 w-5" />
           Catálogo
         </Link>
-        
+
         {/* Profile/Login Section - Always visible in desktop mode */}
         <Link
-          to={isAuthenticated ? "/customer" : "/login"}
-          className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
-            (isAuthenticated && isActive('/customer')) || (!isAuthenticated && isActive('/login'))
+          to={isAuthenticated ? '/customer' : '/login'}
+          className={`flex items-center gap-3 px-3 py-2 transition-colors ${
+            (isAuthenticated && isActive('/customer')) ||
+            (!isAuthenticated && isActive('/login'))
               ? 'text-[#415444] font-semibold'
               : 'text-gray-500 hover:text-gray-900'
           }`}
         >
-          {(isAuthenticated && isActive('/customer')) || (!isAuthenticated && isActive('/login')) && (
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
-          )}
           <FaUser className="h-5 w-5" />
           {isAuthenticated ? 'Perfil' : 'Entrar'}
         </Link>
-        
+
         {isAuthenticated && (
           <>
             <button
@@ -100,19 +101,19 @@ const Sidebar: React.FC<SidebarProps> = ({
             </span>
           )}
           {/* Visual marker to indicate the button is toggleable */}
-          <svg 
+          <svg
             className={`ml-auto h-4 w-4 text-gray-400 transform transition-transform ${
               isCartVisible ? 'rotate-180' : ''
             }`}
-            fill="none" 
-            stroke="currentColor" 
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M19 9l-7 7-7-7" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
             />
           </svg>
         </button>
@@ -124,11 +125,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               : 'text-gray-500 hover:text-gray-900'
           }`}
         >
-        {isActive('/support') && (
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
-        )}
-        <FaHeadset className="h-5 w-5" />
-        Suporte
+          {isActive('/support') && (
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
+          )}
+          <FaHeadset className="h-5 w-5" />
+          Suporte
         </Link>
 
         {isAuthenticated && (
