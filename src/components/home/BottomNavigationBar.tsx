@@ -22,6 +22,12 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   // Handle home tab click with search clearing
   const handleHomeClick = () => {
     onTabChange('home');
+
+    setTimeout(() => {
+      // Add any additional logic here if needed
+      onTabChange('home');
+    }, 100);
+
     if (onClearSearch) {
       onClearSearch();
     }
