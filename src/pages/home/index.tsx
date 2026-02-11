@@ -55,9 +55,12 @@ const Home: React.FC = () => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const location = useLocation();
-  const [mobileActiveTab, setMobileActiveTab] = useState<
-    'home' | 'search' | 'cart' | 'profile'
-  >('home');
+  const activeTab = React.useMemo(() => {
+    if (location.pathname === '/cart') return 'cart';
+    if (location.pathname === '/search') return 'search';
+    if (location.pathname === '/profile') return 'profile';
+    return 'home';
+  }, [location.pathname]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Cart Hook - usando o contexto global
@@ -135,11 +138,6 @@ const Home: React.FC = () => {
   }, [products, maxPrice]);
 
   // Update mobile active tab based on current route
-  useEffect(() => {
-    if (location.pathname === '/cart') {
-      setMobileActiveTab('cart');
-    }
-  }, [location.pathname]);
 
   // Extract categories from products
   const categories = useMemo(() => {
@@ -250,10 +248,19 @@ const Home: React.FC = () => {
 
   const handleMobileTabChange = useCallback(
     (tab: 'home' | 'search' | 'cart' | 'profile') => {
-      if (tab === 'cart') {
-        navigate('/cart');
-      } else {
-        setMobileActiveTab(tab);
+      switch (tab) {
+        case 'home':
+          navigate('/home');
+          break;
+        case 'search':
+          navigate('/search');
+          break;
+        case 'cart':
+          navigate('/cart');
+          break;
+        case 'profile':
+          navigate('/profile');
+          break;
       }
     },
     [navigate],
@@ -296,15 +303,6 @@ const Home: React.FC = () => {
         {/* Show content only if not on cart page */}
         {location.pathname !== '/cart' && (
           <>
-            {/* Mobile Profile Bar - Only show when profile tab is active */}
-            {mobileActiveTab === 'profile' && (
-              <div className="p-4">
-                <p className="text-center text-gray-600">
-                  Redirecionando para o perfil...
-                </p>
-              </div>
-            )}
-
             {/* Header - Desktop only */}
             <div className="hidden lg:block">
               <Header
@@ -314,99 +312,91 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Main Content - Hide when profile tab is active on mobile */}
-            {(mobileActiveTab === 'home' ||
-              mobileActiveTab === 'search' ||
-              window.innerWidth >= 1024) && (
-              <>
-                {/* Banner Cards - Hide when searching on mobile only */}
-                {((!debouncedSearchTerm && mobileActiveTab !== 'search') ||
-                  window.innerWidth >= 1024) && <BannerCards />}
+            {/* Main Content */}
+            <>
+              <BannerCards />
 
-                {/* Advanced Filter and Products Layout */}
-                <div className="flex flex-col lg:flex-row gap-6 mt-8">
-                  {/* Filter Sidebar */}
-                  <div className="w-full lg:w-64 lg:flex-shrink-0">
-                    <div className="lg:sticky lg:top-4">
-                      <AdvancedFilter
-                        categories={categories}
-                        selectedCategories={selectedCategories}
-                        onCategoriesChange={setSelectedCategories}
-                        priceRange={priceRange}
-                        onPriceRangeChange={setPriceRange}
-                        sortBy={sortBy}
-                        onSortChange={setSortBy}
-                        inStockOnly={inStockOnly}
-                        onInStockChange={setInStockOnly}
-                        onClearFilters={handleClearFilters}
-                        productCount={filteredProducts.length}
-                        maxPrice={maxPrice}
-                        isOpen={isFilterOpen}
-                        onOpenChange={setIsFilterOpen}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Products Section */}
-                  <div className="flex-1 min-w-0">
-                    {/* Active Filter Badges */}
-                    <ActiveFilterBadges
+              {/* Advanced Filter and Products Layout */}
+              <div className="flex flex-col lg:flex-row gap-6 mt-8">
+                {/* Filter Sidebar */}
+                <div className="w-full lg:w-64 lg:flex-shrink-0">
+                  <div className="lg:sticky lg:top-4">
+                    <AdvancedFilter
+                      categories={categories}
                       selectedCategories={selectedCategories}
+                      onCategoriesChange={setSelectedCategories}
                       priceRange={priceRange}
+                      onPriceRangeChange={setPriceRange}
                       sortBy={sortBy}
+                      onSortChange={setSortBy}
                       inStockOnly={inStockOnly}
+                      onInStockChange={setInStockOnly}
+                      onClearFilters={handleClearFilters}
+                      productCount={filteredProducts.length}
                       maxPrice={maxPrice}
-                      onRemoveCategory={handleRemoveCategory}
-                      onRemovePriceFilter={handleRemovePriceFilter}
-                      onRemoveSortFilter={handleRemoveSortFilter}
-                      onRemoveStockFilter={handleRemoveStockFilter}
-                      onClearAll={handleClearFilters}
+                      isOpen={isFilterOpen}
+                      onOpenChange={setIsFilterOpen}
                     />
-
-                    {/* Section Header */}
-                    <div className="mb-6 flex items-center justify-between">
-                      <h3 className="text-2xl font-semibold">
-                        {selectedCategories.length > 0
-                          ? selectedCategories.join(', ')
-                          : 'Todos os Produtos'}
-                      </h3>
-                      <span className="text-sm text-gray-600">
-                        {filteredProducts.length}{' '}
-                        {filteredProducts.length === 1 ? 'produto' : 'produtos'}
-                      </span>
-                    </div>
-
-                    {/* Products Grid */}
-                    {filteredProducts.length === 0 ? (
-                      <div className="text-center py-12 text-gray-500">
-                        <p className="text-lg mb-2">
-                          Nenhum produto encontrado.
-                        </p>
-                        <button
-                          onClick={handleClearFilters}
-                          className="text-[#338838] hover:underline text-sm font-medium"
-                        >
-                          Limpar filtros
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
-                        {filteredProducts.map((product: IProduct) => (
-                          <ProductCard
-                            key={product.id}
-                            product={product}
-                            isHovered={hoveredProduct === product.id}
-                            onMouseEnter={() => setHoveredProduct(product.id)}
-                            onMouseLeave={() => setHoveredProduct(null)}
-                            onAddToCart={() => addToCart(product)}
-                          />
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
-              </>
-            )}
+
+                {/* Products Section */}
+                <div className="flex-1 min-w-0">
+                  {/* Active Filter Badges */}
+                  <ActiveFilterBadges
+                    selectedCategories={selectedCategories}
+                    priceRange={priceRange}
+                    sortBy={sortBy}
+                    inStockOnly={inStockOnly}
+                    maxPrice={maxPrice}
+                    onRemoveCategory={handleRemoveCategory}
+                    onRemovePriceFilter={handleRemovePriceFilter}
+                    onRemoveSortFilter={handleRemoveSortFilter}
+                    onRemoveStockFilter={handleRemoveStockFilter}
+                    onClearAll={handleClearFilters}
+                  />
+
+                  {/* Section Header */}
+                  <div className="mb-6 flex items-center justify-between">
+                    <h3 className="text-2xl font-semibold">
+                      {selectedCategories.length > 0
+                        ? selectedCategories.join(', ')
+                        : 'Todos os Produtos'}
+                    </h3>
+                    <span className="text-sm text-gray-600">
+                      {filteredProducts.length}{' '}
+                      {filteredProducts.length === 1 ? 'produto' : 'produtos'}
+                    </span>
+                  </div>
+
+                  {/* Products Grid */}
+                  {filteredProducts.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <p className="text-lg mb-2">Nenhum produto encontrado.</p>
+                      <button
+                        onClick={handleClearFilters}
+                        className="text-[#338838] hover:underline text-sm font-medium"
+                      >
+                        Limpar filtros
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+                      {filteredProducts.map((product: IProduct) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          isHovered={hoveredProduct === product.id}
+                          onMouseEnter={() => setHoveredProduct(product.id)}
+                          onMouseLeave={() => setHoveredProduct(null)}
+                          onAddToCart={() => addToCart(product)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
           </>
         )}
       </main>
@@ -430,7 +420,7 @@ const Home: React.FC = () => {
 
       {/* Mobile Bottom Navigation - Hide when filter is open or on cart page */}
       <BottomNavigationBar
-        activeTab={mobileActiveTab}
+        activeTab={activeTab}
         cartItemsCount={cartItemsCount}
         onTabChange={handleMobileTabChange}
         onClearSearch={() => setSearchTerm('')}
