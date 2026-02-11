@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FaHome, FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 
 interface BottomNavigationBarProps {
@@ -17,8 +16,6 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onClearSearch,
   isHidden = false, // Default to false (visible)
 }) => {
-  const navigate = useNavigate();
-
   // Handle home tab click with search clearing
   const handleHomeClick = () => {
     onTabChange('home');
@@ -35,13 +32,17 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   // Handle search tab click - navigate to search page
   const handleSearchClick = () => {
-    navigate('/search');
+    onTabChange('search');
+
+    setTimeout(() => {
+      // para resolver bug da primeira imagem não atualizar no mobile
+      onTabChange('search');
+    }, 100);
   };
 
   // Handle profile tab click - navigate to profile page
   const handleProfileClick = () => {
     onTabChange('profile');
-    navigate('/profile');
   };
 
   return (
