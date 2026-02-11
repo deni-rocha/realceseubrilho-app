@@ -27,6 +27,12 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     }
   };
 
+  // Handle search tab click - navigate to search page
+  const handleSearchClick = () => {
+    onTabChange('search');
+    navigate('/search');
+  };
+
   // Handle profile tab click - navigate to profile page
   const handleProfileClick = () => {
     onTabChange('profile');
@@ -57,7 +63,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
         {/* Search */}
         <button
-          onClick={() => onTabChange('search')}
+          onClick={handleSearchClick}
           className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'search'
               ? 'text-[#415444]'

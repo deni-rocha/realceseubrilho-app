@@ -24,6 +24,23 @@ import BottomNavigationBar from '../../components/home/BottomNavigationBar';
 import MobileSearchBar from '../../components/home/MobileSearchBar';
 import Toast from '../../components/home/Toast';
 
+// Custom hook for debouncing
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const Home: React.FC = () => {
   // Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +48,9 @@ const Home: React.FC = () => {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortBy, setSortBy] = useState<FilterOptions['sortBy']>('newest');
   const [inStockOnly, setInStockOnly] = useState(false);
+
+  // Debounce the search term to avoid too many filtering operations
+  const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
 
   // UI State
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
@@ -140,7 +160,7 @@ const Home: React.FC = () => {
       // Search filter
       const matchesSearch = product.name
         .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+        .includes(debouncedSearchTerm.toLowerCase());
 
       // Category filter - if no categories selected, show all
       const matchesCategory =
@@ -181,7 +201,7 @@ const Home: React.FC = () => {
     return sorted;
   }, [
     products,
-    searchTerm,
+    debouncedSearchTerm,
     selectedCategories,
     priceRange,
     sortBy,
@@ -311,7 +331,7 @@ const Home: React.FC = () => {
               window.innerWidth >= 1024) && (
               <>
                 {/* Banner Cards - Hide when searching on mobile only */}
-                {((!searchTerm && mobileActiveTab !== 'search') ||
+                {((!debouncedSearchTerm && mobileActiveTab !== 'search') ||
                   window.innerWidth >= 1024) && <BannerCards />}
 
                 {/* Advanced Filter and Products Layout */}

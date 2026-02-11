@@ -19,6 +19,7 @@ import DashboardWithCharts from './components/admin/DashboardWithCharts';
 import RequestResetPassword from './pages/resetPassword/request';
 import ResetPasswordForm from './pages/resetPassword';
 import CartPage from './pages/cart';
+import SearchPage from './pages/search';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -59,6 +60,7 @@ function App() {
               element={<DashboardWithCharts />}
             />
             <Route path="/home" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/customer" element={<CustomerPage />} />
