@@ -21,7 +21,11 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   // Handle home tab click with search clearing
   const handleHomeClick = () => {
-    onTabChange('home');
+    if (location.pathname === '/home') {
+      navigate(-1);
+    } else {
+      navigate('/home');
+    }
     if (onClearSearch) {
       onClearSearch();
     }
