@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa';
 import type { IProduct } from '../../types/catalog';
 
@@ -82,8 +83,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setTouchEnd(0);
   };
 
+  const location = useLocation();
+
   return (
     <div
+      key={`${product.id}-${location.key}`}
       className="group border-0 bg-[#e0e5ce] rounded-[24px] overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -146,7 +150,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <FaChevronLeft className="h-4 w-4 text-gray-800" />
               </button>
             )}
-            
+
             {/* Next arrow - show if not at last image */}
             {currentImageIndex < images.length - 1 && (
               <button
