@@ -28,8 +28,7 @@ const ProfileMobilePage: React.FC = () => {
     } else if (tab === 'cart') {
       navigate('/cart');
     } else if (tab === 'search') {
-      // Para a aba de busca, podemos manter na mesma página ou ir para uma página de busca
-      // Por enquanto, apenas mudamos a aba sem navegar
+      navigate('/search');
     }
   };
 

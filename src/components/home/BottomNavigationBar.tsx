@@ -33,11 +33,14 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   // Handle search tab click - navigate to search page
   const handleSearchClick = () => {
     onTabChange('search');
-
     setTimeout(() => {
       // para resolver bug da primeira imagem não atualizar no mobile
       onTabChange('search');
     }, 100);
+  };
+
+  const handleCartClick = () => {
+    onTabChange('cart');
   };
 
   // Handle profile tab click - navigate to profile page
@@ -86,7 +89,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
         {/* Cart */}
         <button
-          onClick={() => onTabChange('cart')}
+          onClick={handleCartClick}
           className={`flex flex-col items-center justify-center flex-1 h-full transition-colors relative ${
             activeTab === 'cart'
               ? 'text-[#415444]'
