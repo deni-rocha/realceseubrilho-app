@@ -20,11 +20,6 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   const handleHomeClick = () => {
     onTabChange('home');
 
-    setTimeout(() => {
-      // para resolver bug da primeira imagem não atualizar no mobile
-      onTabChange('home');
-    }, 100);
-
     if (onClearSearch) {
       onClearSearch();
     }
@@ -33,10 +28,6 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   // Handle search tab click - navigate to search page
   const handleSearchClick = () => {
     onTabChange('search');
-    setTimeout(() => {
-      // para resolver bug da primeira imagem não atualizar no mobile
-      onTabChange('search');
-    }, 100);
   };
 
   const handleCartClick = () => {

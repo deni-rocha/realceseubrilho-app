@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa';
 import type { IProduct } from '../../types/catalog';
@@ -25,6 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [touchEnd, setTouchEnd] = useState(0);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const imageRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const images =
     product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [];
@@ -34,12 +35,56 @@ const ProductCard: React.FC<ProductCardProps> = ({
   useEffect(() => {
     setCurrentImageIndex(0);
     setIsImageLoading(true);
+
+    // Cleanup: clear timeout if component unmounts
+    return () => {
+      if (imgRef.current) {
+        imgRef.current.onload = null;
+        imgRef.current.onerror = null;
+      }
+    };
   }, [product.id]);
 
-  // Reset loading state when image index changes
+  // Show spinner when image index changes
   useEffect(() => {
     setIsImageLoading(true);
   }, [currentImageIndex]);
+
+  // Detect if image is already loaded (for cached images on mobile)
+  useLayoutEffect(() => {
+    if (!imgRef.current || !images[currentImageIndex]) return;
+
+    const img = imgRef.current;
+
+    const checkImageLoaded = () => {
+      // Only consider loaded if complete AND naturalWidth > 0
+      if (img.complete && img.naturalWidth > 0) {
+        setIsImageLoading(false);
+      }
+    };
+
+    // Check immediately (after layout)
+    requestAnimationFrame(() => {
+      checkImageLoaded();
+    });
+
+    // Fallback: after 1.2s, assume loaded (prevents infinite spinner)
+    const timeoutId = setTimeout(() => {
+      setIsImageLoading(false);
+    }, 1200);
+
+    // Listen to events
+    const handleLoad = () => setIsImageLoading(false);
+    const handleError = () => setIsImageLoading(false);
+    img.onload = handleLoad;
+    img.onerror = handleError;
+
+    return () => {
+      clearTimeout(timeoutId);
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [images, currentImageIndex]);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -116,19 +161,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="relative h-[280px] w-full">
             {/* Spinner de carregamento */}
             {isImageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 z-5">
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 z-5 transition-opacity duration-300">
                 <FaSpinner className="w-8 h-8 text-green-600 animate-spin" />
               </div>
             )}
             <img
               key={currentImageIndex}
+              ref={imgRef}
               src={images[currentImageIndex]}
               alt={`${product.name} - Imagem ${currentImageIndex + 1}`}
               className={`h-[280px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
                 isImageLoading ? 'invisible' : 'visible'
               }`}
-              onLoad={() => setIsImageLoading(false)}
-              onError={() => setIsImageLoading(false)}
             />
           </div>
         ) : (
