@@ -131,7 +131,9 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
               </span>
             )}
           </div>
-          <span className="text-sm text-gray-600">{productCount} produtos</span>
+          <span className="text-sm font-semibold text-gray-600">
+            {productCount} produtos
+          </span>
         </button>
       </div>
 
