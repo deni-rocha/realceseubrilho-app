@@ -363,7 +363,7 @@ const Home: React.FC = () => {
                         ? selectedCategories.join(', ')
                         : 'Todos os Produtos'}
                     </h3>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 hidden md:block">
                       {filteredProducts.length}{' '}
                       {filteredProducts.length === 1 ? 'produto' : 'produtos'}
                     </span>

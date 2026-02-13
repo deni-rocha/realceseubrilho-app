@@ -48,10 +48,10 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
   // Use controlled or uncontrolled state based on props
   const isControlled = isOpen !== undefined;
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
-  
+
   // Determine which state to use
   const effectiveIsOpen = isControlled ? isOpen : uncontrolledIsOpen;
-  
+
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
@@ -120,7 +120,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
       <div className="lg:hidden mb-4">
         <button
           onClick={() => handleSetIsOpen(!effectiveIsOpen)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-[#e0e5ce] border-2 border-[#415444] rounded-full shadow-md hover:bg-[#d1d8c5] transition-all duration-300"
         >
           <div className="flex items-center gap-2">
             <FaFilter className="text-[#415444]" />
