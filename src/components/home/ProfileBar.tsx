@@ -6,6 +6,7 @@ import {
   FaUser,
   FaEnvelope,
   FaHeadset,
+  FaBox,
 } from 'react-icons/fa';
 
 interface ProfileBarProps {
@@ -78,6 +79,15 @@ const ProfileBar: React.FC<ProfileBarProps> = ({
               <span className="font-medium text-base">Configurações</span>
             </Link>
             <Link
+              to="/order-tracking"
+              className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
+            >
+              <div className="w-10 h-10 bg-[#e0e5ce] rounded-lg flex items-center justify-center flex-shrink-0">
+                <FaBox className="h-4 w-4 text-[#415444]" />
+              </div>
+              <span className="font-medium text-base">Rastrear Pedido</span>
+            </Link>
+            <Link
               to="/support"
               className="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
             >
@@ -128,6 +138,14 @@ const ProfileBar: React.FC<ProfileBarProps> = ({
                 <span className="px-3 bg-white text-gray-500">ou</span>
               </div>
             </div>
+            {/* Order Tracking Link */}
+            <Link
+              to="/order-tracking"
+              className="flex items-center justify-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-gray-50 active:bg-gray-100 rounded-xl transition-colors"
+            >
+              <FaBox className="h-5 w-5 text-gray-500" />
+              <span className="font-medium text-base">Rastrear Pedido</span>
+            </Link>
 
             {/* Support Link */}
             <Link

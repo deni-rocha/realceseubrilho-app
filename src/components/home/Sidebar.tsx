@@ -4,6 +4,7 @@ import {
   FaHome,
   FaUser,
   FaShoppingCart,
+  FaBox,
   FaHeadset,
   FaSignOutAlt,
 } from 'react-icons/fa';
@@ -118,6 +119,22 @@ const Sidebar: React.FC<SidebarProps> = ({
             />
           </svg>
         </button>
+
+        <Link
+          to="/order-tracking"
+          className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
+            isActive('/orders')
+              ? 'text-[#415444] font-semibold'
+              : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          {isActive('/orders') && (
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#415444] rounded-r-full" />
+          )}
+          <FaBox className="h-5 w-5" />
+          Meus Pedidos
+        </Link>
+
         <Link
           to="/support"
           className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
