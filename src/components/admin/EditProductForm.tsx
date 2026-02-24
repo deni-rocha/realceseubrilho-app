@@ -20,7 +20,6 @@ interface ProductFormData {
   price?: string;
   cost?: string;
   categoryIds?: string[];
-  isFeatured?: boolean;
   isOnSale?: boolean;
   salePrice?: string;
 }
@@ -128,7 +127,6 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         price: product.price,
         cost: product.cost,
         categoryIds: product.categories?.map((cat) => cat.id) || [],
-        isFeatured: product.isFeatured || false,
         isOnSale: product.isOnSale || false,
         salePrice: product.salePrice || '',
       });
@@ -262,6 +260,24 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         toast.error('O preço promocional deve ser menor que o preço de venda');
         return;
       }
+
+      // Validar se já existe outro produto em promoção
+      if (!product.isOnSale) {
+        const saleResponse = await api.get('/products/public/on-sale');
+        const existingSaleProducts = saleResponse.data;
+
+        if (existingSaleProducts && existingSaleProducts.length > 0) {
+          const otherProduct = existingSaleProducts.find(
+            (p: any) => p.id !== productId,
+          );
+          if (otherProduct) {
+            toast.error(
+              `Já existe um produto em promoção: "${otherProduct.name}". Apenas um produto pode estar em promoção por vez.`,
+            );
+            return;
+          }
+        }
+      }
     }
 
     // Preparar dados para envio
@@ -271,7 +287,6 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       stockQuantity: formData.stockQuantity,
       price: formData.price,
       categoryIds: formData.categoryIds,
-      isFeatured: formData.isFeatured,
       isOnSale: formData.isOnSale,
       // Enviar cost apenas se tiver valor (string não vazia)
       cost:
@@ -389,42 +404,14 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
         </div>
       </div>
 
-      {/* Seção de Destaque e Promoção */}
+      {/* Seção de Promoção */}
       <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 space-y-4">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-          Destaque e Promoção
+          Promoção
         </h3>
 
-        {/* Checkbox Produto em Destaque */}
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            id="isFeatured"
-            name="isFeatured"
-            checked={formData.isFeatured || false}
-            onChange={handleInputChange}
-            className="h-4 w-4 text-yellow-500 border-gray-300 rounded focus:ring-yellow-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
-          />
-          <label
-            htmlFor="isFeatured"
-            className="flex items-center space-x-2 cursor-pointer"
-          >
-            <span className="text-sm text-gray-700 dark:text-gray-200">
-              ⭐ Produto em Destaque
-            </span>
-          </label>
-          {formData.isFeatured && (
-            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
-              Destaque Ativo
-            </span>
-          )}
-        </div>
-        <span className="text-xs text-gray-500 dark:text-gray-400 block ml-7">
-          Produtos em destaque aparecem na seção especial da loja
-        </span>
-
         {/* Checkbox Produto em Promoção */}
-        <div className="flex items-center space-x-3 mt-4">
+        <div className="flex items-center space-x-3">
           <input
             type="checkbox"
             id="isOnSale"

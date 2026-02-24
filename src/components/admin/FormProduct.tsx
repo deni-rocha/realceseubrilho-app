@@ -46,7 +46,6 @@ const productSchema = z.object({
       (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
       'O custo deve ser um valor válido e não negativo',
     ),
-  isFeatured: z.boolean().optional(),
   isOnSale: z.boolean().optional(),
   salePrice: z
     .string()
@@ -161,6 +160,20 @@ const FormProduct: React.FC = () => {
     try {
       setIsSubmitting(true);
 
+      // Validar se já existe um produto em promoção
+      if (data.isOnSale) {
+        const saleResponse = await api.get('/products/public/on-sale');
+        const existingSaleProducts = saleResponse.data;
+
+        if (existingSaleProducts && existingSaleProducts.length > 0) {
+          toast.error(
+            `Já existe um produto em promoção: "${existingSaleProducts[0].name}". Apenas um produto pode estar em promoção por vez.`,
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Primeiro, criar o produto
       // Preparar dados - converter price para string e tratar campos opcionais
       const productData: Record<string, unknown> = {
@@ -169,7 +182,6 @@ const FormProduct: React.FC = () => {
         stockQuantity: data.stockQuantity,
         price: data.price.toFixed(2),
         categoryIds: [data.categoryId],
-        isFeatured: data.isFeatured || false,
         isOnSale: data.isOnSale || false,
       };
 
@@ -516,36 +528,13 @@ const FormProduct: React.FC = () => {
             </div>
           </div>
 
-          {/* Seção de Destaque e Promoção */}
+          {/* Seção de Promoção */}
           <div className="border-t border-gray-300 dark:border-gray-600 pt-6">
             <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">
               Configurações Especiais
             </h3>
 
             <div className="space-y-4">
-              {/* Produto em Destaque */}
-              <div className="flex items-start space-x-3">
-                <div className="flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    id="isFeatured"
-                    {...register('isFeatured')}
-                    className="h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label
-                    htmlFor="isFeatured"
-                    className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
-                  >
-                    ⭐ Produto em Destaque
-                  </label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Marque para exibir este produto na seção de destaques
-                  </p>
-                </div>
-              </div>
-
               {/* Produto em Promoção */}
               <div className="flex items-start space-x-3">
                 <div className="flex items-center h-5">

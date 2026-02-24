@@ -25,7 +25,6 @@ interface IProduct {
   createdAt: string;
   updatedAt: string;
   categories: IProductCategory[];
-  isFeatured?: boolean;
   isOnSale?: boolean;
   salePrice?: string;
 }
@@ -249,11 +248,6 @@ const ProductList: React.FC = () => {
 
                     {/* Badges */}
                     <div className="absolute top-2 right-2 flex flex-col gap-2">
-                      {product.isFeatured && (
-                        <span className="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full shadow-lg">
-                          ⭐ DESTAQUE
-                        </span>
-                      )}
                       {product.isOnSale && (
                         <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg">
                           🔥 PROMOÇÃO
