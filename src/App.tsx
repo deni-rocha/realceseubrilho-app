@@ -63,11 +63,8 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/order-tracking" element={<OrderTrackingPage />} />
-            <Route
-              path="/order-tracking/:orderId"
-              element={<OrderTrackingPage />}
-            />
+            <Route path="/pedido" element={<OrderTrackingPage />} />
+            <Route path="/pedido/:orderId" element={<OrderTrackingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/customer" element={<CustomerPage />} />
             <Route path="*" element={<NotFound />} />

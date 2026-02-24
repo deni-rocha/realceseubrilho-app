@@ -31,8 +31,6 @@ const OrderTrackingPage = () => {
     queryKey: ['orderHistory', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-
-      // esse endpoint ainda não está implementado no backend
       const response = await api.get<Order[]>(`/orders/user/${user.id}`);
       return response.data;
     },
