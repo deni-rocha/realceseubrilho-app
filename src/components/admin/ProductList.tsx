@@ -48,25 +48,35 @@ const ProductList: React.FC = () => {
     },
   });
 
-  // Filtrar produtos
+  // Filtrar e ordenar produtos
   const filteredProducts = useMemo(() => {
-    if (!products || !searchTerm) return products;
+    let result = products || [];
 
-    return products.filter((product) => {
-      const searchValue = searchTerm.toLowerCase();
-      switch (filterBy) {
-        case 'name':
-          return product.name.toLowerCase().includes(searchValue);
-        case 'category':
-          return (
-            product.categories &&
-            product.categories.some((cat) =>
-              cat.name.toLowerCase().includes(searchValue),
-            )
-          );
-        default:
-          return true;
-      }
+    // Aplicar filtro de busca
+    if (searchTerm) {
+      result = result.filter((product) => {
+        const searchValue = searchTerm.toLowerCase();
+        switch (filterBy) {
+          case 'name':
+            return product.name.toLowerCase().includes(searchValue);
+          case 'category':
+            return (
+              product.categories &&
+              product.categories.some((cat) =>
+                cat.name.toLowerCase().includes(searchValue),
+              )
+            );
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Ordenar: produtos em promoção primeiro
+    return [...result].sort((a, b) => {
+      if (a.isOnSale && !b.isOnSale) return -1;
+      if (!a.isOnSale && b.isOnSale) return 1;
+      return 0;
     });
   }, [products, searchTerm, filterBy]);
 

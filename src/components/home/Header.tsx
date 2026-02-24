@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({
         <h2 className="text-2xl font-semibold">
           Olá, {userName}! <span className="ml-1">👋</span>
         </h2>
-        <p className="text-gray-500">Bem-vindo de volta</p>
+        <p className="text-gray-500">Bem-vindo a nossa loja</p>
       </div>
       <div className="flex items-center gap-4">
         <div className="relative flex-1 md:flex-none">

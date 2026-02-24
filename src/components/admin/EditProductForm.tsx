@@ -262,11 +262,15 @@ const EditProductForm: React.FC<EditProductFormProps> = ({
       }
 
       // Validar se já existe outro produto em promoção
-      if (!product.isOnSale) {
+      if (product && !product.isOnSale) {
         const saleResponse = await api.get('/products/public/on-sale');
         const existingSaleProducts = saleResponse.data;
 
-        if (existingSaleProducts && existingSaleProducts.length > 0) {
+        if (
+          existingSaleProducts &&
+          Array.isArray(existingSaleProducts) &&
+          existingSaleProducts.length > 0
+        ) {
           const otherProduct = existingSaleProducts.find(
             (p: any) => p.id !== productId,
           );

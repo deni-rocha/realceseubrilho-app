@@ -165,7 +165,11 @@ const FormProduct: React.FC = () => {
         const saleResponse = await api.get('/products/public/on-sale');
         const existingSaleProducts = saleResponse.data;
 
-        if (existingSaleProducts && existingSaleProducts.length > 0) {
+        if (
+          existingSaleProducts &&
+          Array.isArray(existingSaleProducts) &&
+          existingSaleProducts.length > 0
+        ) {
           toast.error(
             `Já existe um produto em promoção: "${existingSaleProducts[0].name}". Apenas um produto pode estar em promoção por vez.`,
           );
