@@ -21,4 +21,12 @@ export interface Order {
   shippingAddress: string;
   paymentMethod: string;
   orderItems: OrderItem[];
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    whatsapp?: string;
+  };
+  guestName?: string;
+  guestWhatsapp?: string;
 }
