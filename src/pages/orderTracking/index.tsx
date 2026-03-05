@@ -4,7 +4,7 @@ import api from '../../api/index';
 import type { Order } from '../../types/Order';
 import { useAuthStore } from '../../store/authStore';
 import OrderStatusBadge from '../../components/admin/orders/OrderStatusBadge';
-import { FaSpinner } from 'react-icons/fa';
+import { FaSpinner, FaHome } from 'react-icons/fa';
 
 const capitalizeName = (name: string) => {
   return name
@@ -62,23 +62,9 @@ const OrderTrackingPage = () => {
           onClick={() => navigate('/home')}
           className="flex items-center text-gray-600 hover:text-gray-800 transition-colors mb-4"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Voltar para a página inicial
+          <FaHome className="w-5 h-5 mr-2" />
+          Início
         </button>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Acompanhamento de Pedido
-        </h1>
       </div>
 
       {orderId && order ? (
@@ -86,7 +72,7 @@ const OrderTrackingPage = () => {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                Acompanhamento de Pedido
+                Acompanhar Pedido
               </h2>
               <p className="text-gray-600">
                 Data:{' '}
@@ -126,10 +112,14 @@ const OrderTrackingPage = () => {
               </h3>
               <div className="space-y-4">
                 {order.orderItems && order.orderItems.length > 0 ? (
-                  order.orderItems.map((item) => (
+                  order.orderItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-4 border-b pb-4"
+                      className={`flex items-center gap-4 border-b pb-4 ${
+                        index === order.orderItems.length - 1
+                          ? 'border-b-0 pb-0'
+                          : ''
+                      }`}
                     >
                       {/* Imagem do Produto */}
                       <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
@@ -177,9 +167,6 @@ const OrderTrackingPage = () => {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Resumo do Pedido
-              </h3>
               <div className="space-y-3">
                 <div className="flex justify-between pt-2 border-t">
                   <span className="font-semibold text-gray-800">Total</span>
