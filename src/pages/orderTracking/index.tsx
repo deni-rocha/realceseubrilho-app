@@ -6,6 +6,13 @@ import { useAuthStore } from '../../store/authStore';
 import OrderStatusBadge from '../../components/admin/orders/OrderStatusBadge';
 import { FaSpinner } from 'react-icons/fa';
 
+const capitalizeName = (name: string) => {
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const OrderTrackingPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
@@ -52,7 +59,7 @@ const OrderTrackingPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/home')}
           className="flex items-center text-gray-600 hover:text-gray-800 transition-colors mb-4"
         >
           <svg
@@ -67,7 +74,7 @@ const OrderTrackingPage = () => {
               clipRule="evenodd"
             />
           </svg>
-          Voltar
+          Voltar para a página inicial
         </button>
         <h1 className="text-3xl font-bold text-gray-800">
           Acompanhamento de Pedido
@@ -78,15 +85,30 @@ const OrderTrackingPage = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Pedido #{order.id}
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                Acompanhamento de Pedido
               </h2>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600">
                 Data:{' '}
                 {order.orderDate
                   ? new Date(order.orderDate).toLocaleDateString('pt-BR')
                   : 'Data inválida'}
               </p>
+              <p className="text-gray-800 font-medium mt-2">
+                {capitalizeName(
+                  order.user?.name || order.guestName || 'Cliente',
+                )}
+              </p>
+              {order.guestWhatsapp && (
+                <p className="text-gray-600 text-sm">
+                  WhatsApp: {order.guestWhatsapp}
+                </p>
+              )}
+              {order.user?.whatsapp && (
+                <p className="text-gray-600 text-sm">
+                  WhatsApp: {order.user.whatsapp}
+                </p>
+              )}
             </div>
             <OrderStatusBadge
               status={
@@ -145,23 +167,6 @@ const OrderTrackingPage = () => {
                         <p className="text-sm text-gray-600">
                           Quantidade: {item.quantity}
                         </p>
-                        <p className="text-sm text-gray-600">
-                          Preço unitário: R${' '}
-                          {parseFloat(item.product.price || '0').toLocaleString(
-                            'pt-BR',
-                            { minimumFractionDigits: 2 },
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Subtotal */}
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-800">
-                          R${' '}
-                          {item.subtotal.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                          })}
-                        </p>
                       </div>
                     </div>
                   ))
@@ -176,22 +181,9 @@ const OrderTrackingPage = () => {
                 Resumo do Pedido
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">
-                    R${' '}
-                    {order.orderItems
-                      .reduce((sum, item) => sum + item.subtotal, 0)
-                      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Frete</span>
-                  <span className="font-medium">Grátis</span>
-                </div>
                 <div className="flex justify-between pt-2 border-t">
                   <span className="font-semibold text-gray-800">Total</span>
-                  <span className="font-bold text-lg text-blue-600">
+                  <span className="font-bold text-lg text-[#338838]">
                     R${' '}
                     {order.totalAmount.toLocaleString('pt-BR', {
                       minimumFractionDigits: 2,

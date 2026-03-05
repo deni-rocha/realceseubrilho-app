@@ -42,28 +42,47 @@ export default function UrlRedirect() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="text-center">
+      <div className="text-center max-w-md w-full px-6">
         {error ? (
-          <>
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Erro</h1>
-            <p className="text-gray-600">{error}</p>
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Erro</h1>
+            <p className="text-gray-600 mb-6">{error}</p>
             <button
               onClick={() => navigate('/home')}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="w-full bg-[#338838] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#2d7a32] transition-colors"
             >
               Voltar para a página inicial
             </button>
-          </>
+          </div>
         ) : (
-          <>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <div className="flex justify-center mb-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#338838] border-t-transparent"></div>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">
               Redirecionando...
             </h1>
             <p className="text-gray-600">
               Você está sendo redirecionado para o pedido.
             </p>
-            <div className="mt-4 animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          </>
+          </div>
         )}
       </div>
     </div>
