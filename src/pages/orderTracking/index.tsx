@@ -107,16 +107,45 @@ const OrderTrackingPage = () => {
                   order.orderItems.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between border-b pb-4"
+                      className="flex items-center gap-4 border-b pb-4"
                     >
+                      {/* Imagem do Produto */}
+                      <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                        {item.product.imageUrls && item.product.imageUrls[0] ? (
+                          <img
+                            src={item.product.imageUrls[0]}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Informações do Produto */}
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-800">
                           {item.product.name}
                         </h4>
-                        <p className="text-gray-600">
+                        <p className="text-sm text-gray-600">
                           Quantidade: {item.quantity}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-sm text-gray-600">
                           Preço unitário: R${' '}
                           {parseFloat(item.product.price || '0').toLocaleString(
                             'pt-BR',
@@ -124,6 +153,8 @@ const OrderTrackingPage = () => {
                           )}
                         </p>
                       </div>
+
+                      {/* Subtotal */}
                       <div className="text-right">
                         <p className="font-semibold text-gray-800">
                           R${' '}
