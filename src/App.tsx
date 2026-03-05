@@ -21,6 +21,7 @@ import ResetPasswordForm from './pages/resetPassword';
 import CartPage from './pages/cart';
 import SearchPage from './pages/search';
 import OrderTrackingPage from './pages/orderTracking';
+import UrlRedirect from './pages/UrlRedirect';
 
 function App() {
   const { isAuthenticated, role } = useAuth();
@@ -63,6 +64,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/s/:shortCode" element={<UrlRedirect />} />
             <Route path="/pedido" element={<OrderTrackingPage />} />
             <Route path="/pedido/:orderId" element={<OrderTrackingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
