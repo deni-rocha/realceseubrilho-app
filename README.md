@@ -12,7 +12,6 @@ React 19, TypeScript, Vite, Tailwind CSS 4, Zustand para gerenciamento de estado
 - 🛒 **Carrinho**: Adição, remoção e gerenciamento de itens
 - 👤 **Autenticação**: Login, registro e gerenciamento de perfil
 - 📦 **Pedidos**: Histórico e acompanhamento de compras
-- 💳 **Pagamentos**: Checkout seguro com múltiplas formas de pagamento
 - 📱 **PWA**: Aplicação instalável com suporte offline
 - 🎨 **UI Moderna**: Design responsivo com animações fluidas
 
